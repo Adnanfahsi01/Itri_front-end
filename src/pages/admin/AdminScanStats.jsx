@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { API_BASE_URL } from '../../utils/env';
 
 /**
  * AdminScanStats Component
@@ -30,7 +31,7 @@ function AdminScanStats() {
         return;
       }
 
-      const response = await fetch('http://localhost:8000/api/scan-statistics', {
+      const response = await fetch(`${API_BASE_URL}/scan-statistics`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Accept': 'application/json',

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { getSpeakers, createSpeaker, updateSpeaker, deleteSpeaker } from '../../utils/api';
+import { buildStorageUrl } from '../../utils/env';
 
 function AdminSpeakers() {
   const navigate = useNavigate();
@@ -234,7 +235,7 @@ function AdminSpeakers() {
                 <div className="h-64 relative overflow-hidden">
                   {speaker.photo ? (
                     <img
-                      src={`http://localhost:8000/storage/${speaker.photo}`}
+                      src={buildStorageUrl(speaker.photo)}
                       alt={speaker.name}
                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                     />

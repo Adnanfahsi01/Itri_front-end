@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Scanner } from '@yudiel/react-qr-scanner';
+import { API_BASE_URL } from '../../utils/env';
 
 /**
  * AdminQRScanner Component
@@ -172,8 +173,8 @@ function AdminQRScanner() {
       const token = localStorage.getItem('adminToken');
       const isHackathon = qrData.includes('HCK-') || qrData.includes('HACK-');
       const endpoint = isHackathon 
-        ? 'http://localhost:8000/api/admin/hackathons/validate-qr'
-        : 'http://localhost:8000/api/reservations/validate-qr';
+        ? `${API_BASE_URL}/admin/hackathons/validate-qr`
+        : `${API_BASE_URL}/reservations/validate-qr`;
 
       const response = await fetch(endpoint, {
         method: 'POST',
@@ -214,8 +215,8 @@ function AdminQRScanner() {
       const qrData = JSON.stringify({ ticket_code: ticketCode });
       const isHackathon = ticketCode.startsWith('HCK-') || ticketCode.startsWith('HACK-');
       const endpoint = isHackathon 
-        ? 'http://localhost:8000/api/admin/hackathons/validate-qr'
-        : 'http://localhost:8000/api/reservations/validate-qr';
+        ? `${API_BASE_URL}/admin/hackathons/validate-qr`
+        : `${API_BASE_URL}/reservations/validate-qr`;
 
       const response = await fetch(endpoint, {
         method: 'POST',
@@ -249,7 +250,7 @@ function AdminQRScanner() {
       const cleanCode = extractTicketCode(manualCode.trim().toUpperCase());
       
       // First, find the reservation by ticket code to get the email
-      fetch('http://localhost:8000/api/reservations', {
+      fetch(`${API_BASE_URL}/reservations`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('adminToken')}`,
         },

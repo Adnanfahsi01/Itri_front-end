@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Scanner } from '@yudiel/react-qr-scanner';
+import { API_BASE_URL } from '../../utils/env';
 
 /**
  * AdminHackathonScanner Component
@@ -182,7 +183,7 @@ function AdminHackathonScanner() {
           return;
       }
 
-      const endpoint = 'http://localhost:8000/api/admin/hackathons/validate-qr';
+      const endpoint = `${API_BASE_URL}/admin/hackathons/validate-qr`;
 
       const response = await fetch(endpoint, {
         method: 'POST',
@@ -232,7 +233,7 @@ function AdminHackathonScanner() {
           return;
       }
 
-      const endpoint = 'http://localhost:8000/api/admin/hackathons/validate-qr';
+      const endpoint = `${API_BASE_URL}/admin/hackathons/validate-qr`;
 
       const response = await fetch(endpoint, {
         method: 'POST',
@@ -266,7 +267,7 @@ function AdminHackathonScanner() {
       const cleanCode = extractTicketCode(manualCode.trim().toUpperCase());
       
       // First, find the reservation by ticket code to get the email
-      fetch('http://localhost:8000/api/reservations', {
+      fetch(`${API_BASE_URL}/reservations`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('adminToken')}`,
         },
