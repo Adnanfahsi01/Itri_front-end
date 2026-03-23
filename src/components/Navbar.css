@@ -1,0 +1,90 @@
+.navbar-floating {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  z-index: 1000;
+  padding: 15px 0;
+}
+
+.navbar-floating-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 90%;
+  max-width: 1200px;
+  background: rgba(15, 23, 42, 0.8);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  padding: 10px 20px;
+  border-radius: 50px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.navbar-floating-logo img {
+  height: 40px;
+  width: auto;
+}
+
+.navbar-floating-links {
+  display: flex;
+  gap: 30px;
+  align-items: center;
+}
+
+.navbar-floating-link {
+  color: #fff;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 16px;
+  transition: color 0.3s;
+}
+
+.navbar-floating-link:hover {
+  color: #3b82f6;
+}
+
+.navbar-floating-reserve {
+  background: #3b82f6;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 50px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: background 0.3s;
+}
+
+.navbar-floating-reserve:hover {
+  background: #2563eb;
+}
+
+.navbar-floating-menu {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .navbar-floating-menu {
+    display: block;
+    color: white;
+    background: none;
+    border: none;
+  }
+
+  .navbar-floating-links {
+    display: none;
+  }
+
+  .navbar-floating-links.active {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    top: 70px;
+    left: 5%;
+    width: 90%;
+    background: #0f172a;
+    padding: 20px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  }
+}

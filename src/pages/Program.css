@@ -1,0 +1,152 @@
+/* Program Timeline Base Styles */
+.program-page {
+    background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
+    min-height: 100vh;
+    position: relative;
+}
+
+.timeline-container {
+    position: relative;
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 40px 0;
+}
+
+/* The vertical line in the center */
+.timeline-container::after {
+    content: '';
+    position: absolute;
+    width: 4px;
+    background-color: rgba(59, 130, 246, 0.3);
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    margin-left: -2px;
+    border-radius: 4px;
+}
+
+/* Timeline Item Container */
+.timeline-item {
+    padding: 20px 40px;
+    position: relative;
+    background-color: inherit;
+    width: 50%;
+    box-sizing: border-box;
+}
+
+/* Item on the Left */
+.timeline-item.left {
+    left: 0;
+}
+
+/* Item on the Right */
+.timeline-item.right {
+    left: 50%;
+}
+
+/* The Glowing Dot */
+.timeline-dot {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    right: -10px;
+    top: 32px;
+    background-color: #3b82f6;
+    border: 4px solid #1e293b;
+    border-radius: 50%;
+    z-index: 1;
+    box-shadow: 0 0 10px #3b82f6, 0 0 20px rgba(59, 130, 246, 0.5);
+    transition: all 0.3s ease;
+}
+
+.timeline-item.right .timeline-dot {
+    left: -10px;
+}
+
+/* The Content Box (Glassmorphic) */
+.timeline-content {
+    padding: 30px;
+    background: rgba(30, 41, 59, 0.5);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 16px;
+    position: relative;
+    transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.timeline-content:hover {
+    transform: translateY(-5px);
+    background: rgba(30, 41, 59, 0.8);
+    border-color: rgba(59, 130, 246, 0.3);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), inset 0 0 20px rgba(59, 130, 246, 0.05);
+}
+
+.timeline-content:hover~.timeline-dot {
+    transform: scale(1.3);
+    background-color: #60a5fa;
+    box-shadow: 0 0 15px #60a5fa, 0 0 30px rgba(96, 165, 250, 0.8);
+}
+
+/* Connecting Arrow/Triangle */
+.timeline-content::after {
+    content: " ";
+    position: absolute;
+    top: 26px;
+    width: 0;
+    height: 0;
+    z-index: 1;
+    border: medium solid rgba(30, 41, 59, 0.8);
+}
+
+.timeline-item.left .timeline-content::after {
+    right: -16px;
+    border-width: 8px 0 8px 16px;
+    border-color: transparent transparent transparent rgba(30, 41, 59, 0.8);
+}
+
+.timeline-item.right .timeline-content::after {
+    left: -16px;
+    border-width: 8px 16px 8px 0;
+    border-color: transparent rgba(30, 41, 59, 0.8) transparent transparent;
+}
+
+
+/* Responsive Design - Mobile */
+@media screen and (max-width: 768px) {
+
+    /* Place the central line to the left */
+    .timeline-container::after {
+        left: 31px;
+    }
+
+    /* Full width items */
+    .timeline-item {
+        width: 100%;
+        padding-left: 70px;
+        padding-right: 25px;
+    }
+
+    /* Make sure all dots are aligned to the left */
+    .timeline-item.right {
+        left: 0%;
+    }
+
+    .timeline-dot {
+        left: 21px;
+        right: auto;
+    }
+
+    .timeline-item.right .timeline-dot {
+        left: 21px;
+    }
+
+    /* Make sure all arrows point to the left */
+    .timeline-item.left .timeline-content::after,
+    .timeline-item.right .timeline-content::after {
+        left: -16px;
+        border-width: 8px 16px 8px 0;
+        border-color: transparent rgba(30, 41, 59, 0.8) transparent transparent;
+    }
+}

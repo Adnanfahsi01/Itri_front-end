@@ -1,0 +1,333 @@
+import { useState } from 'react';
+import jsPDF from 'jspdf';
+import QRCode from 'qrcode';
+import { registerHackathon } from '../utils/api';
+import Navbar from '../components/Navbar';
+import Footer from '../components/Footer';
+import Background from '../components/Background';
+
+function HackathonRegistration() {
+  const [formData, setFormData] = useState({
+    nom: '',
+    prenom: '',
+    cni: '',
+    email: '',
+    phone: '',
+    fonctionnalite: 'etudiant',
+    etablissement: '',
+    entreprise: '',
+  });
+
+  const [submitting, setSubmitting] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+      // Clear conditional fields when switching role
+      ...(name === 'fonctionnalite' && value === 'etudiant' ? { entreprise: '' } : {}),
+      ...(name === 'fonctionnalite' && value === 'employer' ? { etablissement: '' } : {}),
+    }));
+  };
+
+  const loadImage = (src) => {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.crossOrigin = 'Anonymous';
+      img.onload = () => resolve(img);
+      img.onerror = reject;
+      img.src = src;
+    });
+  };
+
+  const generatePDFTicket = async (registrationData, submittedData) => {
+    // Portrait format badge: 90x140mm
+    const doc = new jsPDF('p', 'mm', [90, 140]);
+
+    const ticketCode = registrationData.ticket_code || 'HCK-UNKNOWN';
+
+    const qrData = JSON.stringify({
+      ticket_code: ticketCode,
+      email: submittedData.email,
+    });
+
+    const qrCodeDataUrl = await QRCode.toDataURL(qrData, {
+      width: 200,
+      margin: 1,
+      color: { dark: '#000000', light: '#ffffff' }
+    });
+
+    // Background: #f9f9f9
+    doc.setFillColor(249, 249, 249);
+    doc.rect(0, 0, 90, 140, 'F');
+
+    // Header (#21277B)
+    doc.setFillColor(33, 39, 123);
+    doc.rect(0, 0, 90, 18, 'F');
+    
+    try {
+      const logoImg = await loadImage('/logo.png');
+      doc.addImage(logoImg, 'PNG', 4, 3, 12, 12);
+    } catch(err) {
+      console.warn('Could not load logo into PDF', err);
+    }
+
+    doc.setTextColor(255, 255, 255);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(11);
+    doc.text('HACKATHON AI ITRI', 50, 9.5, { align: 'center', letterSpacing: 0.5 });
+    
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(7);
+    doc.setTextColor(200, 200, 255); // Light blue tint for the date
+    doc.text('3 AVRIL 2026 • TANGER', 50, 14.5, { align: 'center', letterSpacing: 0.5 });
+
+    // Body
+    // Participant Name
+    doc.setTextColor(51, 51, 51); // #333
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(16);
+    const fullName = `${submittedData.prenom} ${submittedData.nom}`;
+    doc.text(fullName, 45, 32, { align: 'center' });
+
+    // Participant Role
+    doc.setTextColor(33, 39, 123); // #21277B
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(10);
+    const role = submittedData.fonctionnalite === 'etudiant' ? 'Développeur Étudiant' : 'Professionnel';
+    doc.text(role, 45, 40, { align: 'center' });
+
+    // Participant Details
+    doc.setTextColor(102, 102, 102); // #666
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(9);
+    
+    const orgaName = submittedData.fonctionnalite === 'etudiant' ? submittedData.etablissement : submittedData.entreprise;
+    let currentY = 50;
+    const labelOrg = submittedData.fonctionnalite === 'etudiant' ? 'Établissement: ' : 'Entreprise: ';
+    doc.text(`${labelOrg} ${orgaName || 'N/A'}`, 45, currentY, { align: 'center' });
+    currentY += 6;
+    doc.text(`Tél: ${submittedData.phone}`, 45, currentY, { align: 'center' });
+    currentY += 6;
+    doc.text(`Email: ${submittedData.email}`, 45, currentY, { align: 'center' });
+
+    // QR Code Section
+    // Draw QR border
+    doc.setDrawColor(33, 39, 123);
+    doc.setLineWidth(1);
+    doc.roundedRect(26, 72, 38, 38, 3, 3, 'S');
+    
+    // Draw QR Code Image
+    doc.addImage(qrCodeDataUrl, 'PNG', 27.5, 73.5, 35, 35);
+    
+    // QR text
+    doc.setTextColor(136, 136, 136); // #888
+    doc.setFontSize(7);
+    doc.text("Scannez pour valider l'accès", 45, 116, { align: 'center' });
+
+    // Footer (#333)
+    doc.setFillColor(51, 51, 51);
+    doc.rect(0, 130, 90, 10, 'F');
+    
+    doc.setTextColor(255, 255, 255);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(9);
+    doc.text(`ID: ${ticketCode}`, 45, 136.5, { align: 'center', letterSpacing: 0.5 });
+
+    // Draw main border around card
+    doc.setDrawColor(224, 224, 224); // #e0e0e0
+    doc.setLineWidth(0.5);
+    doc.rect(0.25, 0.25, 89.5, 139.5, 'S');
+
+    doc.save(`Hackathon_Badge_${submittedData.nom}_${submittedData.prenom}.pdf`);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setSubmitting(true);
+    setError('');
+    
+    try {
+      const response = await registerHackathon(formData);
+      
+      if (response.data && response.data.data) {
+        await generatePDFTicket(response.data.data, formData);
+      }
+
+      setSuccess(true);
+      setFormData({
+        nom: '', prenom: '', cni: '', email: '', phone: '',
+        fonctionnalite: 'etudiant', etablissement: '', entreprise: ''
+      });
+      window.scrollTo(0, 0);
+    } catch (err) {
+      if (err.response?.data?.errors) {
+        const errMessages = Object.values(err.response.data.errors).flat().join('\n');
+        setError(errMessages);
+      } else {
+        setError(err.response?.data?.message || 'Erreur lors de l\'inscription. Veuillez vérifier vos données.');
+      }
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen py-16 pt-32">
+      <div className="container mx-auto px-6 mb-12 text-center">
+        <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
+          Inscription au Hackathon
+        </h1>
+        <p className="text-lg text-slate-400 max-w-3xl mx-auto">
+          Rejoignez-nous pour notre Hackathon exclusif ! Remplissez le formulaire ci-dessous pour confirmer votre participation.
+        </p>
+      </div>
+
+      {success && (
+        <div className="container mx-auto px-6 mb-8">
+          <div className="bg-green-900/40 border border-green-500/50 text-green-100 px-6 py-8 rounded-lg text-center backdrop-blur-sm animate-fadeIn">
+            <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-800/50 mb-4 text-green-400">
+              <svg className="h-10 w-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+            <p className="text-lg mb-2">Votre inscription a bien été enregistrée avec succès. Après étude de votre candidature, vous serez contacté par e-mail, WhatsApp ou téléphone afin de confirmer votre participation.</p>
+            <p className="text-sm font-bold opacity-80 mt-4">Votre reçu d'inscription a été téléchargé automatiquement en format PDF.</p>
+          </div>
+        </div>
+      )}
+
+      {error && (
+        <div className="container mx-auto px-6 mb-8">
+          <div className="bg-red-900/40 border border-red-500/50 text-red-100 px-6 py-4 rounded-lg text-center backdrop-blur-sm">
+             <p className="whitespace-pre-line">{error}</p>
+          </div>
+        </div>
+      )}
+
+      <div className="container mx-auto px-6 mb-20">
+        <div className="max-w-2xl mx-auto bg-slate-800 border border-slate-700 p-8 md:p-10 rounded-2xl shadow-xl">
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="grid md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-semibold mb-2 text-slate-300">Prénom *</label>
+                <input
+                  type="text"
+                  name="prenom"
+                  value={formData.prenom}
+                  onChange={handleInputChange}
+                  required
+                  className="w-full px-4 py-2 bg-slate-700 text-white border border-slate-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold mb-2 text-slate-300">Nom *</label>
+                <input
+                  type="text"
+                  name="nom"
+                  value={formData.nom}
+                  onChange={handleInputChange}
+                  required
+                  className="w-full px-4 py-2 bg-slate-700 text-white border border-slate-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                />
+              </div>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-semibold mb-2 text-slate-300">CNI *</label>
+                <input
+                  type="text"
+                  name="cni"
+                  value={formData.cni}
+                  onChange={handleInputChange}
+                  required
+                  className="w-full px-4 py-2 bg-slate-700 text-white border border-slate-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold mb-2 text-slate-300">Téléphone *</label>
+                <input
+                  type="tel"
+                  name="phone"
+                  value={formData.phone}
+                  onChange={handleInputChange}
+                  required
+                  className="w-full px-4 py-2 bg-slate-700 text-white border border-slate-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold mb-2 text-slate-300">Email *</label>
+              <input
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleInputChange}
+                required
+                className="w-full px-4 py-2 bg-slate-700 text-white border border-slate-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold mb-2 text-slate-300">Fonctionnalité *</label>
+              <select
+                name="fonctionnalite"
+                value={formData.fonctionnalite}
+                onChange={handleInputChange}
+                required
+                className="w-full px-4 py-2 bg-slate-700 text-white border border-slate-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+              >
+                <option value="etudiant">Étudiant</option>
+                <option value="employer">Employé</option>
+              </select>
+            </div>
+
+            {formData.fonctionnalite === 'etudiant' && (
+              <div>
+                <label className="block text-sm font-semibold mb-2 text-slate-300">Établissement *</label>
+                <input
+                  type="text"
+                  name="etablissement"
+                  value={formData.etablissement}
+                  onChange={handleInputChange}
+                  required
+                  className="w-full px-4 py-2 bg-slate-700 text-white border border-slate-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                />
+              </div>
+            )}
+
+            {formData.fonctionnalite === 'employer' && (
+              <div>
+                <label className="block text-sm font-semibold mb-2 text-slate-300">Entreprise *</label>
+                <input
+                  type="text"
+                  name="entreprise"
+                  value={formData.entreprise}
+                  onChange={handleInputChange}
+                  required
+                  className="w-full px-4 py-2 bg-slate-700 text-white border border-slate-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                />
+              </div>
+            )}
+
+            <button
+              type="submit"
+              disabled={submitting}
+              className="w-full bg-primary text-white py-3 rounded-lg font-bold text-lg hover:bg-opacity-90 disabled:bg-slate-600 disabled:text-slate-400 disabled:cursor-not-allowed transform hover:scale-[1.02] transition-all"
+            >
+              {submitting ? 'Validation en cours...' : 'Valider l\'inscription'}
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default HackathonRegistration;
