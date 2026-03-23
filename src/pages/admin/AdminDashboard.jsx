@@ -39,15 +39,30 @@ function AdminDashboard() {
       ]);
 
       setStats(statsRes.data);
-      setReservations(reservationsRes.data || []);
-      setSpeakers(speakersRes.data || []);
+      const reservationPayload = reservationsRes.data;
+      const reservationItems = Array.isArray(reservationPayload)
+        ? reservationPayload
+        : Array.isArray(reservationPayload?.data)
+          ? reservationPayload.data
+          : [];
+      setReservations(reservationItems);
+
+      const speakersPayload = speakersRes.data;
+      const speakerItems = Array.isArray(speakersPayload)
+        ? speakersPayload
+        : Array.isArray(speakersPayload?.data)
+          ? speakersPayload.data
+          : [];
+      setSpeakers(speakerItems);
 
       const programData = programsRes.data;
-      const allPrograms = [
-        ...(programData.day1 || []),
-        ...(programData.day2 || []),
-        ...(programData.day3 || []),
-      ];
+      const allPrograms = Array.isArray(programData)
+        ? programData
+        : [
+            ...(Array.isArray(programData?.day1) ? programData.day1 : []),
+            ...(Array.isArray(programData?.day2) ? programData.day2 : []),
+            ...(Array.isArray(programData?.day3) ? programData.day3 : []),
+          ];
       setPrograms(allPrograms);
     } catch (error) {
       console.error('Error loading dashboard:', error);
@@ -320,12 +335,12 @@ function AdminDashboard() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50">
-                {reservations.slice(0, 5).map((reservation) => (
+                {(Array.isArray(reservations) ? reservations : []).slice(0, 5).map((reservation) => (
                   <tr key={reservation.id} className="hover:bg-gray-50/50 transition-colors group">
                     <td className="py-5 px-8">
                       <div className="flex items-center gap-3">
                         <div className="w-9 h-9 bg-gradient-to-br from-indigo-50 to-blue-50 text-primary font-black text-[10px] rounded-full flex items-center justify-center border border-indigo-100 shadow-inner">
-                          {reservation.first_name[0]}{reservation.last_name[0]}
+                          {(reservation.first_name?.[0] || '?')}{(reservation.last_name?.[0] || '?')}
                         </div>
                         <div className="font-bold text-gray-800 text-sm tracking-tight group-hover:text-primary transition-colors">
                           {reservation.first_name} {reservation.last_name}
