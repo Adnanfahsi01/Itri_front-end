@@ -1,10 +1,8 @@
-const fallbackApiBase = import.meta.env.DEV ? 'http://127.0.0.1:8000/api' : '';
+const fallbackApiBase = import.meta.env.DEV
+  ? 'http://127.0.0.1:8000/api'
+  : 'https://itri-event-api-edd4gmanbfhrgubz.westeurope-01.azurewebsites.net/api';
 
-const rawApiBaseUrl = import.meta.env.VITE_API_URL || fallbackApiBase;
-
-if (!rawApiBaseUrl) {
-  console.error('Missing VITE_API_URL. Set it in Azure Static Web Apps and redeploy.');
-}
+const rawApiBaseUrl = (import.meta.env.VITE_API_URL || fallbackApiBase).trim();
 
 export const API_BASE_URL = rawApiBaseUrl.replace(/\/$/, '');
 

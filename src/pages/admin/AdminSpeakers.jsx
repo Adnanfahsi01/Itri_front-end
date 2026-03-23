@@ -24,7 +24,13 @@ function AdminSpeakers() {
   const loadSpeakers = async () => {
     try {
       const response = await getSpeakers();
-      setSpeakers(response.data || []);
+      const payload = response.data;
+      const speakerItems = Array.isArray(payload)
+        ? payload
+        : Array.isArray(payload?.data)
+          ? payload.data
+          : [];
+      setSpeakers(speakerItems);
     } catch (error) {
       console.error('Error loading speakers:', error);
     } finally {

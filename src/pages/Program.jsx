@@ -14,10 +14,13 @@ function Program() {
   const loadPrograms = async () => {
     try {
       const response = await getPrograms();
+      const payload = response.data;
+      const day1 = Array.isArray(payload?.day1) ? payload.day1 : [];
+      const day2 = Array.isArray(payload?.day2) ? payload.day2 : [];
       // Response is grouped by day: { day1: [], day2: [], day3: [] }
       const allPrograms = [
-        ...(response.data.day1 || []).map(p => ({ ...p, day: 'Day 1' })),
-        ...(response.data.day2 || []).map(p => ({ ...p, day: 'Day 2' })),
+        ...day1.map(p => ({ ...p, day: 'Day 1' })),
+        ...day2.map(p => ({ ...p, day: 'Day 2' })),
       ];
       setPrograms(allPrograms);
     } catch (error) {
