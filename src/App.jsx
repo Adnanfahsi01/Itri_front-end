@@ -17,6 +17,7 @@ import AdminQRScanner from './pages/admin/AdminQRScanner';
 import AdminScanStats from './pages/admin/AdminScanStats';
 import AdminHackathon from './pages/admin/AdminHackathon';
 import HackathonRegistration from './pages/HackathonRegistration';
+import AdminRoute from './components/AdminRoute';
 
 function App() {
   return (
@@ -24,13 +25,15 @@ function App() {
       <Routes>
         {/* Admin Routes (without navbar/footer) */}
         <Route path="/admin/login" element={<AdminLogin />} />
-        <Route path="/admin/dashboard" element={<AdminDashboard />} />
-        <Route path="/admin/reservations" element={<AdminReservations />} />
-        <Route path="/admin/speakers" element={<AdminSpeakers />} />
-        <Route path="/admin/programs" element={<AdminPrograms />} />
-        <Route path="/admin/qr-scanner" element={<AdminQRScanner />} />
-        <Route path="/admin/scan-stats" element={<AdminScanStats />} />
-        <Route path="/admin/hackathons" element={<AdminHackathon />} />
+        <Route element={<AdminRoute />}>
+          <Route path="/admin/dashboard" element={<AdminDashboard />} />
+          <Route path="/admin/reservations" element={<AdminReservations />} />
+          <Route path="/admin/speakers" element={<AdminSpeakers />} />
+          <Route path="/admin/programs" element={<AdminPrograms />} />
+          <Route path="/admin/qr-scanner" element={<AdminQRScanner />} />
+          <Route path="/admin/scan-stats" element={<AdminScanStats />} />
+          <Route path="/admin/hackathons" element={<AdminHackathon />} />
+        </Route>
 
         {/* Public Routes (with navbar/footer) */}
         <Route
