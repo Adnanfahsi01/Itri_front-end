@@ -30,14 +30,14 @@ export default function Objectives() {
         </h2>
 
         <div className="objectives-grid">
-          {objectives.map((obj, idx) => {
+          {objectives.map((obj) => {
             const IconComponent = obj.icon;
             if (!IconComponent) {
               console.warn('Missing icon for objective:', obj.title);
               return null;
             }
             return (
-              <div key={idx} className="objective-card">
+              <div key={obj.title} className="objective-card">
                 <div className="objective-icon">
                   <IconComponent sx={{ fontSize: 56 }} />
                 </div>

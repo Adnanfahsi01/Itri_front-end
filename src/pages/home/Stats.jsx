@@ -1,13 +1,37 @@
+import { useEffect, useState } from 'react';
 import CountUp from '../../components/CountUp';
 import EventNoteIcon from '@mui/icons-material/EventNote';
 import MicIcon from '@mui/icons-material/Mic';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
+import { getSpeakers } from '../../utils/api';
 import './Home.css';
 
 export default function Stats() {
+  const [speakersCount, setSpeakersCount] = useState(0);
+
+  useEffect(() => {
+    const loadSpeakersCount = async () => {
+      try {
+        const response = await getSpeakers();
+        const payload = response.data;
+        const speakers = Array.isArray(payload)
+          ? payload
+          : Array.isArray(payload?.data)
+            ? payload.data
+            : [];
+        setSpeakersCount(speakers.length);
+      } catch (error) {
+        console.error('Error loading speakers count:', error);
+        setSpeakersCount(0);
+      }
+    };
+
+    loadSpeakersCount();
+  }, []);
+
   const stats = [
     { end: 3, label: 'Jours intensifs', Icon: EventNoteIcon },
-    { end: 20, label: 'Speakers internationaux', Icon: MicIcon, suffix: '+' },
+    { end: speakersCount, label: 'Speakers internationaux', Icon: MicIcon },
     { end: 80, label: 'Places exclusives', Icon: EmojiEventsIcon }
   ];
 
@@ -35,7 +59,6 @@ export default function Stats() {
                     direction="up"
                     duration={1}
                     className="count-up-text"
-                    startCounting
                   />
                 </div>
                 <p className="stat-label">{stat.label}</p>
