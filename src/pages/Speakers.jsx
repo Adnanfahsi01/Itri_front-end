@@ -75,7 +75,7 @@ function Speakers() {
                 <div className="w-full h-64 bg-gradient-to-br from-slate-800 to-primary flex items-center justify-center pointer-events-none">
                   {speaker.photo ? (
                     <img
-                      src={buildStorageUrl(speaker.photo)}
+                      src={speaker.photo_url || buildStorageUrl(speaker.photo)}
                       alt={speaker.name}
                       className="w-full h-full object-cover"
                     />

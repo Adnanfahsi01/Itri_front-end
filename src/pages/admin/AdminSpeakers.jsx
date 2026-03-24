@@ -241,7 +241,7 @@ function AdminSpeakers() {
                 <div className="h-64 relative overflow-hidden">
                   {speaker.photo ? (
                     <img
-                      src={buildStorageUrl(speaker.photo)}
+                      src={speaker.photo_url || buildStorageUrl(speaker.photo)}
                       alt={speaker.name}
                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                     />

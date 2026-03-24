@@ -11,5 +11,21 @@ export const BACKEND_BASE_URL =
 
 export const buildStorageUrl = (path = '') => {
   if (!path) return '';
-  return `${BACKEND_BASE_URL}/storage/${String(path).replace(/^\/+/, '')}`;
+
+  const rawPath = String(path).trim();
+
+  // Keep fully qualified URLs untouched.
+  if (/^https?:\/\//i.test(rawPath)) {
+    return rawPath;
+  }
+
+  const normalizedPath = rawPath.replace(/^\/+/, '');
+
+  // Support files stored directly under public/ (e.g. public/speakers/*).
+  if (normalizedPath.startsWith('speakers/') || normalizedPath.startsWith('storage/')) {
+    return `${BACKEND_BASE_URL}/${normalizedPath}`;
+  }
+
+  // Backward compatibility for legacy records stored on the public disk.
+  return `${BACKEND_BASE_URL}/storage/${normalizedPath}`;
 };
