@@ -223,6 +223,12 @@ function HackathonRegistration() {
       return;
     }
 
+    if (formData.registration_type === 'team' && !formData.team_name.trim()) {
+      setSubmitting(false);
+      setError('Le nom de l\'equipe est obligatoire pour une inscription en equipe.');
+      return;
+    }
+
     if (formData.registration_type === 'team' && cleanedMembers.length > MAX_INVITED_MEMBERS) {
       setSubmitting(false);
       setError('Maximum 2 membres invites (leader + 2 membres).');
@@ -231,8 +237,21 @@ function HackathonRegistration() {
     
     try {
       const payload = {
-        ...formData,
-        members: formData.registration_type === 'team' ? cleanedMembers : [],
+        cni: formData.cni,
+        email: formData.email,
+        phone: formData.phone,
+        nom: formData.nom,
+        prenom: formData.prenom,
+        registration_type: formData.registration_type,
+        fonctionnalite: formData.fonctionnalite,
+        etablissement: formData.etablissement,
+        entreprise: formData.entreprise,
+        ...(formData.registration_type === 'team'
+          ? {
+              team_name: formData.team_name.trim(),
+              members: cleanedMembers,
+            }
+          : {}),
       };
 
       const response = await registerHackathon(payload);
