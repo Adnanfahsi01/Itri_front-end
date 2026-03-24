@@ -78,7 +78,7 @@ function AdminScanStats() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#F8FAFC] flex justify-center items-center">
+      <div className="min-h-screen bg-[#F8FAFC] flex justify-center items-center admin-reduced-motion">
         <div className="text-center animate-in fade-in duration-700">
           <div className="relative w-20 h-20 mx-auto mb-6">
             <div className="absolute inset-0 border-4 border-secondary/20 rounded-full"></div>
@@ -93,7 +93,7 @@ function AdminScanStats() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-[#F8FAFC]">
+      <div className="min-h-screen bg-[#F8FAFC] admin-reduced-motion">
         <header className="bg-white/70 backdrop-blur-md border-b border-gray-200 sticky top-0 z-30">
           <div className="container mx-auto px-6 py-4">
             <div className="flex justify-between items-center">
@@ -128,14 +128,17 @@ function AdminScanStats() {
     );
   }
 
+  const recentScansPerDay = (Array.isArray(stats?.scans_per_day) ? stats.scans_per_day : []).slice(-4);
+  const maxRecentDayCount = recentScansPerDay.reduce((max, day) => Math.max(max, day?.count || 0), 0);
+
   return (
-    <div className="min-h-screen bg-[#F8FAFC]">
+    <div className="min-h-screen bg-[#F8FAFC] admin-reduced-motion">
       {/* Header */}
       <header className="bg-white/70 backdrop-blur-md border-b border-gray-200 sticky top-0 z-30">
         <div className="container mx-auto px-6 py-4">
           <div className="flex justify-between items-center">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-gradient-to-br from-secondary to-primary rounded-xl flex items-center justify-center shadow-lg shadow-secondary/20 rotate-3 transition-transform duration-300">
+              <div className="w-12 h-12 bg-gradient-to-br from-secondary to-primary rounded-xl flex items-center justify-center shadow-lg shadow-secondary/20">
                 <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" />
                 </svg>
@@ -172,10 +175,10 @@ function AdminScanStats() {
         {/* Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
           {/* Card 1 */}
-          <div className="bg-white/90 backdrop-blur-sm p-8 rounded-[2rem] border border-gray-100 shadow-xl shadow-gray-200/40 relative overflow-hidden group hover:-translate-y-2 transition-all duration-500">
-            <div className="absolute -top-10 -right-10 w-32 h-32 bg-primary/5 rounded-full blur-2xl group-hover:bg-primary/10 transition-colors"></div>
+          <div className="bg-white/90 backdrop-blur-sm p-8 rounded-[2rem] border border-gray-100 shadow-xl shadow-gray-200/40 relative overflow-hidden">
+            <div className="absolute -top-10 -right-10 w-32 h-32 bg-primary/5 rounded-full blur-2xl"></div>
             <div className="relative z-10">
-              <div className="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-primary mb-6 group-hover:scale-110 transition-transform">
+              <div className="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-primary mb-6">
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
               </div>
               <p className="text-[10px] font-black text-muted uppercase tracking-[0.2em] mb-2">Pool d'Inscrits</p>
@@ -187,10 +190,10 @@ function AdminScanStats() {
           </div>
 
           {/* Card 2 */}
-          <div className="bg-white/90 backdrop-blur-sm p-8 rounded-[2rem] border border-gray-100 shadow-xl shadow-gray-200/40 relative overflow-hidden group hover:-translate-y-2 transition-all duration-500">
-            <div className="absolute -top-10 -right-10 w-32 h-32 bg-emerald-500/5 rounded-full blur-2xl group-hover:bg-emerald-500/10 transition-colors"></div>
+          <div className="bg-white/90 backdrop-blur-sm p-8 rounded-[2rem] border border-gray-100 shadow-xl shadow-gray-200/40 relative overflow-hidden">
+            <div className="absolute -top-10 -right-10 w-32 h-32 bg-emerald-500/5 rounded-full blur-2xl"></div>
             <div className="relative z-10">
-              <div className="w-12 h-12 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-600 mb-6 group-hover:scale-110 transition-transform">
+              <div className="w-12 h-12 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-600 mb-6">
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
               </div>
               <p className="text-[10px] font-black text-muted uppercase tracking-[0.2em] mb-2">Validation Uniques</p>
@@ -205,10 +208,10 @@ function AdminScanStats() {
           </div>
 
           {/* Card 3 */}
-          <div className="bg-white/90 backdrop-blur-sm p-8 rounded-[2rem] border border-gray-100 shadow-xl shadow-gray-200/40 relative overflow-hidden group hover:-translate-y-2 transition-all duration-500">
-            <div className="absolute -top-10 -right-10 w-32 h-32 bg-secondary/5 rounded-full blur-2xl group-hover:bg-secondary/10 transition-colors"></div>
+          <div className="bg-white/90 backdrop-blur-sm p-8 rounded-[2rem] border border-gray-100 shadow-xl shadow-gray-200/40 relative overflow-hidden">
+            <div className="absolute -top-10 -right-10 w-32 h-32 bg-secondary/5 rounded-full blur-2xl"></div>
             <div className="relative z-10">
-              <div className="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-secondary mb-6 group-hover:scale-110 transition-transform">
+              <div className="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-secondary mb-6">
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z" /></svg>
               </div>
               <p className="text-[10px] font-black text-muted uppercase tracking-[0.2em] mb-2">Flux d'Entrées Total</p>
@@ -218,10 +221,10 @@ function AdminScanStats() {
           </div>
 
           {/* Card 4 */}
-          <div className="bg-white/90 backdrop-blur-sm p-8 rounded-[2rem] border border-gray-100 shadow-xl shadow-gray-200/40 relative overflow-hidden group hover:-translate-y-2 transition-all duration-500">
-            <div className="absolute -top-10 -right-10 w-32 h-32 bg-accent/5 rounded-full blur-2xl group-hover:bg-accent/10 transition-colors"></div>
+          <div className="bg-white/90 backdrop-blur-sm p-8 rounded-[2rem] border border-gray-100 shadow-xl shadow-gray-200/40 relative overflow-hidden">
+            <div className="absolute -top-10 -right-10 w-32 h-32 bg-accent/5 rounded-full blur-2xl"></div>
             <div className="relative z-10">
-              <div className="w-12 h-12 bg-pink-50 rounded-2xl flex items-center justify-center text-accent mb-6 group-hover:scale-110 transition-transform">
+              <div className="w-12 h-12 bg-pink-50 rounded-2xl flex items-center justify-center text-accent mb-6">
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
               </div>
               <p className="text-[10px] font-black text-muted uppercase tracking-[0.2em] mb-2">KPI Engagement</p>
@@ -239,7 +242,7 @@ function AdminScanStats() {
               Distribution Chronologique
             </h2>
             <div className="flex flex-col gap-10 items-end">
-              {stats.scans_per_day.map((day, index) => (
+              {recentScansPerDay.map((day, index) => (
                 <div key={index} className="w-full group">
                   <div className="flex justify-between items-center mb-3">
                     <div className="flex items-center gap-3">
@@ -252,7 +255,7 @@ function AdminScanStats() {
                     <div
                       className="h-full bg-gradient-to-r from-secondary via-primary to-accent rounded-lg shadow-[0_0_15px_0_rgba(33,39,123,0.15)] relative overflow-hidden transition-all duration-1000 ease-out delay-[100ms]"
                       style={{
-                        width: `${Math.max((day.count / Math.max(...stats.scans_per_day.map(d => d.count))) * 100, 3)}%`
+                        width: `${Math.max(((day.count || 0) / Math.max(maxRecentDayCount, 1)) * 100, 3)}%`
                       }}
                     >
                       <div className="absolute inset-0 bg-white/20 -skew-x-12 translate-x-full group-hover:-translate-x-full transition-transform duration-1000"></div>

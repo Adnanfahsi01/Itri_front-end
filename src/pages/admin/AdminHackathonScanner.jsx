@@ -322,13 +322,13 @@ function AdminHackathonScanner() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC]">
+    <div className="min-h-screen bg-[#F8FAFC] admin-reduced-motion">
       {/* Header */}
       <header className="bg-white/70 backdrop-blur-md border-b border-gray-200 sticky top-0 z-30">
         <div className="container mx-auto px-6 py-4">
           <div className="flex justify-between items-center">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-gradient-to-br from-secondary to-primary rounded-xl flex items-center justify-center shadow-lg shadow-secondary/20 rotate-3 transition-transform duration-300">
+              <div className="w-12 h-12 bg-gradient-to-br from-secondary to-primary rounded-xl flex items-center justify-center shadow-lg shadow-secondary/20">
                 <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 4v1l7 7m2 2l-2 2m-2 2l-7 7m-1-7l-7 7m-2-2l2-2m2-2l7-7" />
                 </svg>
@@ -357,7 +357,7 @@ function AdminHackathonScanner() {
         <div className="grid lg:grid-cols-2 gap-10 items-start">
 
           {/* QR Scanner Section */}
-          <div className="bg-white/90 backdrop-blur-sm p-10 rounded-[2.5rem] border border-gray-100 shadow-2xl shadow-gray-200/40 relative overflow-hidden group">
+          <div className="bg-white/90 backdrop-blur-sm p-10 rounded-[2.5rem] border border-gray-100 shadow-2xl shadow-gray-200/40 relative overflow-hidden group max-w-4xl w-full mx-auto">
             <div className="absolute top-0 right-0 w-64 h-64 bg-secondary/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
 
             <h2 className="text-2xl font-black text-gray-800 tracking-tight mb-8 flex items-center gap-4 relative z-10">
@@ -405,7 +405,7 @@ function AdminHackathonScanner() {
             {/* QR Viewer Area */}
             <div className="relative group/scanner z-10">
               {!scanResult ? (
-                <div className="rounded-[2.5rem] overflow-hidden border-8 border-gray-50 bg-gray-900 relative min-h-[340px] sm:min-h-[420px] lg:min-h-[460px] flex items-center justify-center shadow-2xl">
+                <div className="rounded-[2.5rem] overflow-hidden border-8 border-gray-50 bg-gray-900 relative aspect-square w-full max-w-[560px] mx-auto flex items-center justify-center shadow-2xl">
                   {scanning && (
                     <div className="absolute inset-0 z-10">
                       <Scanner
@@ -426,7 +426,7 @@ function AdminHackathonScanner() {
                       {/* Scanning Lasers */}
                       <div className="absolute inset-0 border-[30px] border-black/20 z-0"></div>
                       <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="w-[78vw] h-[78vw] max-w-[320px] max-h-[320px] sm:w-[22rem] sm:h-[22rem] border-2 border-primary/40 rounded-[2rem] relative overflow-hidden">
+                        <div className="w-[78vw] h-[78vw] max-w-[300px] max-h-[300px] sm:w-[20rem] sm:h-[20rem] border-2 border-primary/40 rounded-[2rem] relative overflow-hidden">
                           <div className="absolute inset-0 bg-primary/5"></div>
                           {/* Scanning Line Animation */}
                           <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary to-transparent shadow-[0_0_20px_2px_rgba(59,130,246,0.8)] animate-[scan_2.5s_ease-in-out_infinite]"></div>
@@ -466,7 +466,7 @@ function AdminHackathonScanner() {
                   )}
                 </div>
               ) : (
-                <div className="rounded-[2.5rem] border-8 border-emerald-50 bg-emerald-500/10 aspect-square md:aspect-video flex flex-col items-center justify-center text-center p-12 animate-in zoom-in-95 duration-500 shadow-inner">
+                <div className="rounded-[2.5rem] border-8 border-emerald-50 bg-emerald-500/10 aspect-square w-full max-w-[560px] mx-auto flex flex-col items-center justify-center text-center p-12 animate-in zoom-in-95 duration-500 shadow-inner">
                   <div className="w-28 h-28 bg-emerald-500 rounded-[2rem] flex items-center justify-center shadow-2xl shadow-emerald-200 mb-8 animate-bounce relative">
                     <div className="absolute inset-0 rounded-[2rem] bg-emerald-500 animate-ping opacity-20"></div>
                     <svg className="w-14 h-14 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">

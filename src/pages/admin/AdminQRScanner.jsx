@@ -304,13 +304,13 @@ function AdminQRScanner() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC]">
+    <div className="min-h-screen bg-[#F8FAFC] admin-reduced-motion">
       {/* Header */}
       <header className="bg-white/70 backdrop-blur-md border-b border-gray-200 sticky top-0 z-30">
         <div className="container mx-auto px-6 py-4">
           <div className="flex justify-between items-center">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-gradient-to-br from-secondary to-primary rounded-xl flex items-center justify-center shadow-lg shadow-secondary/20 rotate-3 transition-transform duration-300">
+              <div className="w-12 h-12 bg-gradient-to-br from-secondary to-primary rounded-xl flex items-center justify-center shadow-lg shadow-secondary/20">
                 <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 4v1l7 7m2 2l-2 2m-2 2l-7 7m-1-7l-7 7m-2-2l2-2m2-2l7-7" />
                 </svg>
@@ -336,10 +336,10 @@ function AdminQRScanner() {
       </header>
 
       <div className="container mx-auto px-6 py-10">
-        <div className="grid lg:grid-cols-2 gap-10 items-start">
+        <div className="grid lg:grid-cols-1 gap-10 items-start">
 
           {/* QR Scanner Section */}
-          <div className="bg-white/90 backdrop-blur-sm p-10 rounded-[2.5rem] border border-gray-100 shadow-2xl shadow-gray-200/40 relative overflow-hidden group">
+          <div className="bg-white/90 backdrop-blur-sm p-10 rounded-[2.5rem] border border-gray-100 shadow-2xl shadow-gray-200/40 relative overflow-hidden group max-w-4xl w-full mx-auto">
             <div className="absolute top-0 right-0 w-64 h-64 bg-secondary/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
 
             <h2 className="text-2xl font-black text-gray-800 tracking-tight mb-8 flex items-center gap-4 relative z-10">
@@ -387,7 +387,7 @@ function AdminQRScanner() {
             {/* QR Viewer Area */}
             <div className="relative group/scanner z-10">
               {!scanResult ? (
-                <div className="rounded-[2.5rem] overflow-hidden border-8 border-gray-50 bg-gray-900 relative min-h-[340px] sm:min-h-[420px] lg:min-h-[460px] flex items-center justify-center shadow-2xl">
+                <div className="rounded-[2.5rem] overflow-hidden border-8 border-gray-50 bg-gray-900 relative aspect-square w-full max-w-[560px] mx-auto flex items-center justify-center shadow-2xl">
                   <div id="qr-reader" className="w-full h-full object-cover"></div>
                   {scanning && (
                     <div className="absolute inset-0 z-10">
@@ -409,7 +409,7 @@ function AdminQRScanner() {
                       {/* Scanning Lasers */}
                       <div className="absolute inset-0 border-[30px] border-black/20 z-0"></div>
                       <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="w-[78vw] h-[78vw] max-w-[320px] max-h-[320px] sm:w-[22rem] sm:h-[22rem] border-2 border-primary/40 rounded-[2rem] relative overflow-hidden">
+                        <div className="w-[78vw] h-[78vw] max-w-[300px] max-h-[300px] sm:w-[20rem] sm:h-[20rem] border-2 border-primary/40 rounded-[2rem] relative overflow-hidden">
                           <div className="absolute inset-0 bg-primary/5"></div>
                           {/* Scanning Line Animation */}
                           <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary to-transparent shadow-[0_0_20px_2px_rgba(59,130,246,0.8)] animate-[scan_2.5s_ease-in-out_infinite]"></div>
@@ -449,7 +449,7 @@ function AdminQRScanner() {
                   )}
                 </div>
               ) : (
-                <div className="rounded-[2.5rem] border-8 border-emerald-50 bg-emerald-500/10 aspect-square md:aspect-video flex flex-col items-center justify-center text-center p-12 animate-in zoom-in-95 duration-500 shadow-inner">
+                <div className="rounded-[2.5rem] border-8 border-emerald-50 bg-emerald-500/10 aspect-square w-full max-w-[560px] mx-auto flex flex-col items-center justify-center text-center p-12 animate-in zoom-in-95 duration-500 shadow-inner">
                   <div className="w-28 h-28 bg-emerald-500 rounded-[2rem] flex items-center justify-center shadow-2xl shadow-emerald-200 mb-8 animate-bounce relative">
                     <div className="absolute inset-0 rounded-[2rem] bg-emerald-500 animate-ping opacity-20"></div>
                     <svg className="w-14 h-14 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -494,160 +494,6 @@ function AdminQRScanner() {
             </div>
           </div>
 
-          {/* Result Section */}
-          <div className="bg-white/90 backdrop-blur-sm p-10 rounded-[2.5rem] border border-gray-100 shadow-2xl shadow-gray-200/40 h-full min-h-[600px] flex flex-col relative overflow-hidden">
-            <div className="absolute bottom-0 left-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2 pointer-events-none"></div>
-
-            <h2 className="text-2xl font-black text-gray-800 tracking-tight mb-8 flex items-center gap-4 relative z-10">
-              <div className="w-2.5 h-8 bg-purple-500 rounded-full"></div>
-              Console de Validation
-            </h2>
-
-            <div className="flex-1 flex flex-col relative z-10">
-              {loading ? (
-                <div className="flex-1 flex flex-col items-center justify-center gap-8 animate-pulse text-center">
-                  <div className="relative">
-                    <div className="w-24 h-24 border-4 border-secondary/20 rounded-full animate-spin"></div>
-                    <div className="absolute inset-0 w-24 h-24 border-t-4 border-secondary rounded-full animate-spin"></div>
-                  </div>
-                  <div>
-                    <h3 className="text-2xl font-black text-gray-800 uppercase tracking-tighter mb-2">Interrogation DB...</h3>
-                    <p className="text-muted text-[10px] font-black uppercase tracking-[0.2em] opacity-60">Recherche de signature dans le Cloud ITRI</p>
-                  </div>
-                </div>
-              ) : !validationResult ? (
-                <div className="flex-1 flex flex-col items-center justify-center text-center p-12 group">
-                  <div className="w-40 h-40 bg-gray-50 rounded-full flex items-center justify-center mb-10 border border-gray-100 shadow-inner group-hover:scale-110 transition-transform duration-500">
-                    <svg className="w-20 h-20 text-gray-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
-                    </svg>
-                  </div>
-                  <h3 className="text-gray-400 font-black uppercase tracking-[0.2em] text-sm mb-4">Système en Veille</h3>
-                  <p className="text-muted text-[10px] font-bold uppercase tracking-widest max-w-[200px] leading-loose">Approchez un code de la cellule photoélectrique pour initier le processus</p>
-                </div>
-              ) : (
-                <div className={`p-8 rounded-[2rem] flex flex-col flex-1 ${validationResult.valid
-                  ? 'bg-emerald-50/50 border border-emerald-100'
-                  : 'bg-red-50/50 border border-red-100'
-                  } animate-in fade-in zoom-in-95 duration-500`}>
-
-                  {/* Status Banner */}
-                  <div className="flex items-center gap-8 mb-10">
-                    <div className={`w-24 h-24 rounded-[1.5rem] flex items-center justify-center shadow-2xl relative ${validationResult.valid ? 'bg-emerald-500 shadow-emerald-200' : 'bg-red-500 shadow-red-200'
-                      }`}>
-                      <div className="absolute inset-0 bg-white/20 animate-pulse rounded-[1.5rem]"></div>
-                      <svg className="w-12 h-12 text-white relative z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        {validationResult.valid
-                          ? <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={4} d="M5 13l4 4L19 7" />
-                          : <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={4} d="M6 18L18 6M6 6l12 12" />
-                        }
-                      </svg>
-                    </div>
-                    <div>
-                      <h3 className={`text-4xl font-black uppercase tracking-tighter leading-none mb-2 ${validationResult.valid ? 'text-emerald-700' : 'text-red-700'
-                        }`}>
-                        {validationResult.valid ? 'VALIDE' : 'REFUSÉ'}
-                      </h3>
-                      <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border ${validationResult.valid
-                          ? 'bg-emerald-100 text-emerald-600 border-emerald-200'
-                          : 'bg-red-100 text-red-600 border-red-200'
-                        }`}>
-                        {validationResult.message}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Reservation Details Card */}
-                  {validationResult.reservation && (
-                    <div className="bg-white/70 backdrop-blur-sm rounded-3xl p-8 border border-white shadow-xl flex flex-col gap-8 flex-1">
-                      <div className="flex justify-between items-start">
-                        <div className="flex items-center gap-4">
-                          <div className="w-14 h-14 bg-gradient-to-br from-gray-50 to-white border border-gray-100 rounded-2xl flex items-center justify-center text-primary font-black text-xl shadow-inner">
-                            {validationResult.reservation.first_name[0]}{validationResult.reservation.last_name[0]}
-                          </div>
-                          <div>
-                            <p className="text-[9px] font-black text-muted uppercase tracking-widest mb-1">Identité Confirmée</p>
-                            <h4 className="text-2xl font-black text-gray-800 tracking-tight leading-none mb-1">
-                              {validationResult.reservation.first_name} {validationResult.reservation.last_name}
-                            </h4>
-                            <p className="text-[10px] font-black text-secondary uppercase tracking-widest">{validationResult.reservation.institution_name || 'HORS CORPS'}</p>
-                          </div>
-                        </div>
-                        <div className="bg-gray-900 text-white px-4 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-[0.2em] shadow-lg">
-                          {validationResult.reservation.role === 'student' ? 'Student Elite' : 'Professional Staff'}
-                        </div>
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-8">
-                        <div>
-                          <p className="text-[9px] font-black text-muted uppercase tracking-widest mb-1.5">Communications</p>
-                          <p className="text-xs font-bold text-gray-700 break-all">{validationResult.reservation.email}</p>
-                          <p className="text-xs font-bold text-gray-400 mt-0.5">{validationResult.reservation.phone}</p>
-                        </div>
-                        <div>
-                          <p className="text-[9px] font-black text-muted uppercase tracking-widest mb-1.5">Accréditations</p>
-                          <div className="flex gap-1.5">
-                            {validationResult.reservation.days?.map(d => (
-                              <span key={d} className="w-6 h-6 bg-secondary text-white text-[9px] flex items-center justify-center rounded-md font-black shadow-lg shadow-secondary/10 border border-white/20">
-                                {d.replace('day', 'J')}
-                              </span>
-                            ))}
-                          </div>
-                          <p className="text-[9px] font-black text-primary uppercase mt-2 group-hover:underline cursor-none">Ticket: {validationResult.reservation.ticket_code}</p>
-                        </div>
-                      </div>
-
-                      {/* Usage Telemetry */}
-                      {validationResult.max_scans && (
-                        <div className="mt-auto space-y-4">
-                          <div className={`p-6 rounded-2xl relative overflow-hidden group/alert ${validationResult.scan_count >= validationResult.max_scans
-                            ? 'bg-red-50 text-red-700 border border-red-100'
-                            : 'bg-emerald-50 text-emerald-700 border border-emerald-100 shadow-[0_0_20px_0_rgba(16,185,129,0.05)]'
-                            }`}>
-
-                            <div className="flex justify-between items-center relative z-10 mb-3">
-                              <div className="flex items-center gap-3">
-                                <span className="text-2xl animate-pulse">{validationResult.scan_count >= validationResult.max_scans ? '🔒' : '📶'}</span>
-                                <h5 className="text-[10px] font-black uppercase tracking-widest">Télémétrie d'accès</h5>
-                              </div>
-                              <span className="text-lg font-black">{validationResult.scan_count} / {validationResult.max_scans}</span>
-                            </div>
-
-                            {/* Progress bar */}
-                            <div className="h-2.5 bg-black/5 rounded-full overflow-hidden relative z-10">
-                              <div
-                                className={`h-full transition-all duration-1000 ease-out shadow-[0_0_10px_0_rgba(0,0,0,0.1)] ${validationResult.scan_count >= validationResult.max_scans ? 'bg-red-500' : 'bg-emerald-500'
-                                  }`}
-                                style={{ width: `${(validationResult.scan_count / validationResult.max_scans) * 100}%` }}
-                              ></div>
-                            </div>
-                          </div>
-
-                          {/* Action Center */}
-                          {validationResult.valid && !validationResult.is_used && (
-                            <button
-                              onClick={() => markTicketAsUsed(validationResult.reservation.ticket_code)}
-                              className="w-full relative group/btn h-20 bg-gray-900 rounded-[1.5rem] overflow-hidden shadow-2xl transition-all active:scale-[0.98] hover:shadow-primary/20"
-                            >
-                              <div className="absolute inset-0 bg-gradient-to-r from-secondary via-primary to-accent translate-x-full group-hover/btn:translate-x-0 transition-transform duration-700 opacity-90"></div>
-                              <div className="relative z-10 flex items-center justify-center gap-4">
-                                <div className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center backdrop-blur-md">
-                                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" />
-                                  </svg>
-                                </div>
-                                <span className="text-white font-black uppercase tracking-[0.3em] text-xs">Autoriser Entrée</span>
-                              </div>
-                            </button>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-          </div>
         </div>
 
         {/* Mobile-first Validation Popup */}
