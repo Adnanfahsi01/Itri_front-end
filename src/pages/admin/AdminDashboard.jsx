@@ -82,8 +82,8 @@ function AdminDashboard() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-2xl text-primary font-semibold animate-pulse">Loading dashboard...</div>
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 admin-reduced-motion">
+        <div className="text-2xl text-primary font-semibold">Loading dashboard...</div>
       </div>
     );
   }
@@ -102,20 +102,20 @@ function AdminDashboard() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC]">
+    <div className="min-h-screen bg-[#F8FAFC] admin-reduced-motion">
       {/* Header */}
-      <header className="bg-white/70 backdrop-blur-md border-b border-gray-200 sticky top-0 z-20">
+      <header className="bg-white border-b border-gray-200 sticky top-0 z-20">
         <div className="container mx-auto px-6 py-4">
           <div className="flex justify-between items-center">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-gradient-to-br from-secondary to-primary rounded-xl flex items-center justify-center shadow-lg shadow-primary/20 rotate-3 group hover:rotate-0 transition-transform duration-300">
+              <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center shadow-sm">
                 <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z" />
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z" />
                 </svg>
               </div>
               <div>
-                <h1 className="text-2xl font-black bg-clip-text text-transparent bg-gradient-to-r from-secondary via-primary to-accent tracking-tight">
+                <h1 className="text-2xl font-black text-gray-800 tracking-tight">
                   Tableau de bord
                 </h1>
                 <p className="text-[10px] font-bold text-muted uppercase tracking-[0.2em] -mt-1">Administration • ITRI 2026</p>
@@ -128,10 +128,9 @@ function AdminDashboard() {
               </div>
               <button
                 onClick={handleLogout}
-                className="group relative px-6 py-2.5 bg-white text-gray-700 border border-gray-200 rounded-xl font-bold hover:text-red-600 hover:border-red-100 transition-all flex items-center gap-2 overflow-hidden shadow-sm hover:shadow-md active:scale-95"
+                className="px-6 py-2.5 bg-white text-gray-700 border border-gray-200 rounded-xl font-bold hover:text-red-600 hover:border-red-200 transition-colors flex items-center gap-2 shadow-sm"
               >
-                <div className="absolute inset-0 bg-red-50 translate-y-full group-hover:translate-y-0 transition-transform duration-300 -z-10" />
-                <svg className="w-4 h-4 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                 </svg>
                 Déconnexion
@@ -174,15 +173,13 @@ function AdminDashboard() {
               shadow: 'shadow-emerald-500/20'
             },
           ].map((stat, i) => (
-            <div key={i} className={`relative overflow-hidden group bg-white p-6 rounded-3xl border border-gray-100 shadow-xl ${stat.shadow} hover:-translate-y-2 transition-all duration-300`}>
-              <div className={`absolute top-0 right-0 w-24 h-24 bg-gradient-to-br ${stat.color} opacity-[0.03] rounded-bl-[80px] group-hover:scale-110 transition-transform duration-500`} />
+            <div key={i} className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
               <div className="flex justify-between items-start mb-4">
-                <div className={`p-3 bg-gradient-to-br ${stat.color} rounded-2xl shadow-lg shadow-indigo-500/10`}>
+                <div className={`p-3 bg-gradient-to-br ${stat.color} rounded-xl`}>
                   <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d={stat.icon} />
                   </svg>
                 </div>
-                <div className="px-2 py-1 bg-gray-50 rounded-lg border border-gray-100 text-[10px] font-black text-muted uppercase tracking-tighter">Live</div>
               </div>
               <h3 className="text-gray-500 text-[11px] font-black uppercase tracking-widest mb-1">{stat.label}</h3>
               <p className="text-3xl font-black text-gray-800 tracking-tight">{stat.value}</p>
@@ -192,7 +189,7 @@ function AdminDashboard() {
 
         {/* Charts Section */}
         <div className="grid lg:grid-cols-2 gap-8 mb-10">
-          <div className="bg-white/80 backdrop-blur-sm p-8 rounded-[2rem] border border-gray-100 shadow-xl shadow-gray-200/50">
+          <div className="bg-white p-8 rounded-2xl border border-gray-100 shadow-sm">
             <div className="flex justify-between items-center mb-8">
               <h3 className="text-lg font-black text-gray-800 tracking-tight flex items-center gap-3">
                 <div className="w-2 h-7 bg-primary rounded-full"></div>
@@ -238,7 +235,7 @@ function AdminDashboard() {
             </ResponsiveContainer>
           </div>
 
-          <div className="bg-white/80 backdrop-blur-sm p-8 rounded-[2rem] border border-gray-100 shadow-xl shadow-gray-200/50">
+          <div className="bg-white p-8 rounded-2xl border border-gray-100 shadow-sm">
             <div className="flex justify-between items-center mb-8">
               <h3 className="text-lg font-black text-gray-800 tracking-tight flex items-center gap-3">
                 <div className="w-2 h-7 bg-accent rounded-full"></div>
@@ -296,9 +293,9 @@ function AdminDashboard() {
               <Link
                 key={i}
                 to={link.to}
-                className="group bg-white p-6 rounded-3xl border border-gray-100 shadow-sm hover:shadow-2xl hover:border-primary/20 transform hover:-translate-y-2 transition-all duration-300 flex flex-col items-center gap-4"
+                className="group bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:border-primary/20 transition-colors flex flex-col items-center gap-4"
               >
-                <div className={`p-4 bg-gray-50 rounded-2xl ${link.color} group-hover:bg-primary group-hover:text-white transition-all duration-300 shadow-inner`}>
+                <div className={`p-4 bg-gray-50 rounded-xl ${link.color} group-hover:bg-primary group-hover:text-white transition-colors`}>
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     {link.icon}
                   </svg>
@@ -310,7 +307,7 @@ function AdminDashboard() {
         </div>
 
         {/* Recent Reservations Table */}
-        <div className="bg-white rounded-[2.5rem] shadow-xl shadow-gray-200/50 border border-gray-100 overflow-hidden mb-10">
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mb-10">
           <div className="p-8 border-b border-gray-50 flex justify-between items-center bg-gray-50/30">
             <div>
               <h3 className="text-xl font-black text-gray-800 tracking-tight">Réservations Récentes</h3>
@@ -318,7 +315,7 @@ function AdminDashboard() {
             </div>
             <Link
               to="/admin/reservations"
-              className="px-5 py-2 bg-white text-primary text-xs font-black uppercase tracking-widest rounded-xl shadow-sm border border-gray-100 hover:bg-primary hover:text-white transition-all duration-300"
+              className="px-5 py-2 bg-white text-primary text-xs font-black uppercase tracking-widest rounded-xl shadow-sm border border-gray-100 hover:bg-primary hover:text-white transition-colors"
             >
               Voir Tout
             </Link>

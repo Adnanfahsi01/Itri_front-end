@@ -41,7 +41,7 @@ function AdminLogin() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0F172A] flex items-center justify-center px-6 relative overflow-hidden">
+    <div className="min-h-screen bg-[#0F172A] flex items-center justify-center px-6 relative overflow-hidden admin-reduced-motion">
       {/* Dynamic Background Elements */}
       <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-secondary/20 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/2 animate-pulse" />
       <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-primary/20 rounded-full blur-[120px] translate-y-1/2 -translate-x-1/2 animate-pulse [animation-delay:2s]" />

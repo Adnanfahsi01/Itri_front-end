@@ -44,3 +44,22 @@ textarea {
 ::-webkit-scrollbar-thumb:hover {
   background: #21277B;
 }
+
+/* Reduce motion intensity on admin pages while keeping image motion intact */
+.admin-reduced-motion *:not(img):not(picture):not(video) {
+  transition-duration: 120ms !important;
+  transition-delay: 0ms !important;
+}
+
+.admin-reduced-motion .animate-spin,
+.admin-reduced-motion .animate-pulse,
+.admin-reduced-motion .animate-bounce,
+.admin-reduced-motion .animate-ping,
+.admin-reduced-motion .animate-shake,
+.admin-reduced-motion [class*="animate-in"],
+.admin-reduced-motion [class*="fade-in"],
+.admin-reduced-motion [class*="slide-in"],
+.admin-reduced-motion [class*="zoom-in"],
+.admin-reduced-motion [class*="animate-[scan_"] {
+  animation: none !important;
+}
