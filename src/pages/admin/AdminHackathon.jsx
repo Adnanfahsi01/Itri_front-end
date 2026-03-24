@@ -6,6 +6,7 @@ function AdminHackathon() {
   const navigate = useNavigate();
   const [registrations, setRegistrations] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [expandedTeams, setExpandedTeams] = useState({});
   const [filters, setFilters] = useState({
     role: '',
     participation: '',
@@ -74,6 +75,13 @@ function AdminHackathon() {
     } catch (error) {
       alert("Erreur lors de la suppression.");
     }
+  };
+
+  const toggleTeamMembers = (registrationId) => {
+    setExpandedTeams((prev) => ({
+      ...prev,
+      [registrationId]: !prev[registrationId],
+    }));
   };
 
   const handleExportToCSV = () => {
@@ -239,7 +247,27 @@ function AdminHackathon() {
                         <td className="py-5 px-8">
                           <div className="font-black text-gray-800 text-sm tracking-tight">{reservation.prenom} {reservation.nom}</div>
                           {reservation.team_name && (
-                            <div className="text-[10px] text-indigo-600 font-bold mt-1">{reservation.team_name}</div>
+                            <div className="mt-1 flex items-center gap-2">
+                              <span className="text-[10px] text-indigo-600 font-bold">Equipe: {reservation.team_name}</span>
+                              {Array.isArray(reservation.members) && reservation.members.length > 0 && (
+                                <button
+                                  type="button"
+                                  onClick={() => toggleTeamMembers(reservation.id)}
+                                  className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold rounded-md bg-indigo-50 text-indigo-700 border border-indigo-200"
+                                  title={expandedTeams[reservation.id] ? 'Masquer les membres' : 'Afficher les membres'}
+                                >
+                                  <svg
+                                    className={`w-3.5 h-3.5 transition-transform ${expandedTeams[reservation.id] ? 'rotate-180' : ''}`}
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                  >
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 9l-7 7-7-7" />
+                                  </svg>
+                                  {expandedTeams[reservation.id] ? 'Masquer' : 'Voir'}
+                                </button>
+                              )}
+                            </div>
                           )}
                         </td>
                         <td className="py-5 px-8">
@@ -314,7 +342,7 @@ function AdminHackathon() {
                         </td>
                       </tr>
 
-                      {(reservation.registration_type || 'solo') === 'team' && Array.isArray(reservation.members) && reservation.members.length > 0 && (
+                      {(reservation.registration_type || 'solo') === 'team' && Array.isArray(reservation.members) && reservation.members.length > 0 && expandedTeams[reservation.id] && (
                         <tr>
                           <td colSpan="9" className="px-8 pb-6">
                             <div className="bg-slate-50 border border-slate-200 rounded-xl p-4">

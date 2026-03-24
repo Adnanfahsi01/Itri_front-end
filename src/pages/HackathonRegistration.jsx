@@ -4,6 +4,7 @@ import QRCode from 'qrcode';
 import { registerHackathon } from '../utils/api';
 
 function HackathonRegistration() {
+  const MAX_INVITED_MEMBERS = 2;
   const [nextMemberId, setNextMemberId] = useState(1);
   const [formData, setFormData] = useState({
     nom: '',
@@ -37,6 +38,12 @@ function HackathonRegistration() {
   };
 
   const addMember = () => {
+    if (formData.members.length >= MAX_INVITED_MEMBERS) {
+      setError('Maximum 2 membres invites (leader + 2 membres).');
+      return;
+    }
+
+    setError('');
     const memberId = nextMemberId;
     setNextMemberId((prev) => prev + 1);
 
@@ -215,6 +222,12 @@ function HackathonRegistration() {
       setError('Ajoutez au moins un membre avec nom complet et email.');
       return;
     }
+
+    if (formData.registration_type === 'team' && cleanedMembers.length > MAX_INVITED_MEMBERS) {
+      setSubmitting(false);
+      setError('Maximum 2 membres invites (leader + 2 membres).');
+      return;
+    }
     
     try {
       const payload = {
@@ -242,7 +255,9 @@ function HackathonRegistration() {
         const errMessages = Object.values(err.response.data.errors).flat().join('\n');
         setError(errMessages);
       } else {
-        setError(err.response?.data?.message || 'Erreur lors de l\'inscription. Veuillez vérifier vos données.');
+        const backendError = err.response?.data?.error;
+        const backendMessage = err.response?.data?.message;
+        setError(backendError || backendMessage || 'Erreur lors de l\'inscription. Veuillez vérifier vos données.');
       }
     } finally {
       setSubmitting(false);
@@ -402,11 +417,14 @@ function HackathonRegistration() {
                     <button
                       type="button"
                       onClick={addMember}
-                      className="px-3 py-1.5 bg-slate-700 text-white text-xs font-semibold rounded-md hover:bg-slate-600 transition-all"
+                      disabled={formData.members.length >= MAX_INVITED_MEMBERS}
+                      className="px-3 py-1.5 bg-slate-700 text-white text-xs font-semibold rounded-md hover:bg-slate-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       Ajouter un membre
                     </button>
                   </div>
+
+                  <p className="text-[11px] text-slate-400">Maximum: 2 membres invites (leader + 2).</p>
 
                   {formData.members.length === 0 ? (
                     <p className="text-xs text-slate-400">Ajoutez les membres que vous souhaitez inviter.</p>
