@@ -47,7 +47,7 @@ function Program() {
   return (
     <div className="program-page pt-32 pb-24">
       {/* Header */}
-      <div className="container mx-auto px-6 mb-24 text-center">
+      <div className="container mx-auto px-6 mb-28 text-center">
         <h1 className="text-5xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-b from-white to-slate-400 mb-8 tracking-tight">
           Event Program
         </h1>
@@ -58,7 +58,7 @@ function Program() {
       </div>
 
       {/* Day Selector */}
-      <div className="container mx-auto px-6 mb-20">
+      <div className="container mx-auto px-6 mb-24">
         <div className="flex justify-center gap-4 flex-wrap">
           {['Day 1', 'Day 2'].map((day) => (
             <button
@@ -83,7 +83,7 @@ function Program() {
       </div>
 
       {/* Program Schedule Timeline */}
-      <div className="container mx-auto px-4">
+      <div className="container mx-auto px-4 mt-6">
         {currentPrograms.length === 0 ? (
           <div className="text-center py-16">
             <p className="text-xl text-slate-500">

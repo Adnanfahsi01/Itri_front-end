@@ -270,8 +270,8 @@ function HackathonRegistration() {
         <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
           Inscription au Hackathon
         </h1>
-        <p className="text-lg text-slate-400 max-w-3xl mx-auto">
-          Rejoignez-nous pour notre Hackathon exclusif ! Remplissez le formulaire ci-dessous pour confirmer votre participation.
+        <p className="text-lg text-slate-400 max-w-4xl mx-auto leading-relaxed">
+          Le Hackathon AI Tanger est une initiative organisée par ITRIAI dans le but de stimuler l'innovation locale en intelligence artificielle. Face à une ville en pleine transformation - entre le développement du port Tanger Med, l'expansion urbaine et les défis sociaux - cet événement vise à mobiliser la jeunesse estudiantine pour proposer des solutions concrètes et applicables. L'événement s'inscrit dans une vision plus large : faire de Tanger un hub régional de l'innovation technologique, en mettant l'AI au service des problèmes réels de la ville.
         </p>
       </div>
 

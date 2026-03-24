@@ -301,42 +301,31 @@ function AdminHackathon() {
                           <div className="text-xs font-bold text-gray-700">{new Date(reservation.created_at).toLocaleDateString()}</div>
                         </td>
                         <td className="py-5 px-8">
-                          <span className={`px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest ${
-                            reservation.status === 'confirmed' ? 'bg-green-50 text-green-600 border border-green-200' :
-                            reservation.status === 'canceled' ? 'bg-red-50 text-red-600 border border-red-200' :
-                            'bg-yellow-50 text-yellow-600 border border-yellow-200'
+                          <span className={`inline-flex items-center whitespace-nowrap px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest ${
+                            reservation.status === 'confirmed' ? 'bg-green-100 text-green-700 border border-green-200' :
+                            reservation.status === 'canceled' ? 'bg-red-100 text-red-700 border border-red-200' :
+                            'bg-amber-100 text-amber-700 border border-amber-200'
                           }`}>
-                            {reservation.status === 'confirmed' ? 'Confirme' : reservation.status === 'canceled' ? 'Annule' : 'En attente'}
+                            {reservation.status === 'confirmed' ? 'Valide' : reservation.status === 'canceled' ? 'Annule' : 'En attente'}
                           </span>
                         </td>
                         <td className="py-5 px-8 text-right">
-                          <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <div className="flex items-center justify-end gap-2">
                             {reservation.status !== 'confirmed' && (
                               <button
                                 onClick={() => handleUpdateStatus(reservation.id, 'confirmed')}
-                                className="px-3 py-1.5 bg-green-50 text-green-600 rounded-lg text-xs font-bold hover:bg-green-600 hover:text-white transition-all shadow-sm active:scale-95"
-                                title="Confirmer"
+                                className="px-3 py-1.5 bg-green-50 text-green-700 border border-green-200 rounded-lg text-xs font-bold hover:bg-green-600 hover:text-white transition-all shadow-sm active:scale-95"
+                                title="Valider"
                               >
-                                Confirmer
-                              </button>
-                            )}
-                            {reservation.status !== 'canceled' && (
-                              <button
-                                onClick={() => handleUpdateStatus(reservation.id, 'canceled')}
-                                className="px-3 py-1.5 bg-yellow-50 text-yellow-600 rounded-lg text-xs font-bold hover:bg-yellow-600 hover:text-white transition-all shadow-sm active:scale-95"
-                                title="Annuler"
-                              >
-                                Annuler
+                                Valider
                               </button>
                             )}
                             <button
                               onClick={() => handleDelete(reservation.id)}
-                              className="p-1.5 bg-red-50 text-red-600 rounded-lg hover:bg-red-600 hover:text-white transition-all shadow-sm active:scale-95"
+                              className="px-3 py-1.5 bg-red-50 text-red-700 border border-red-200 rounded-lg text-xs font-bold hover:bg-red-600 hover:text-white transition-all shadow-sm active:scale-95"
                               title="Supprimer"
                             >
-                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                              </svg>
+                              Supprimer
                             </button>
                           </div>
                         </td>
@@ -364,7 +353,7 @@ function AdminHackathon() {
                                         <td className="py-2 font-semibold text-gray-800">{member.full_name}</td>
                                         <td className="py-2 text-gray-700">{member.email}</td>
                                         <td className="py-2">
-                                          <span className={`px-2 py-1 rounded-md text-[9px] font-black uppercase tracking-wider ${
+                                          <span className={`inline-flex items-center whitespace-nowrap px-2 py-1 rounded-md text-[9px] font-black uppercase tracking-wider ${
                                             member.status === 'confirmed' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'
                                           }`}>
                                             {member.status === 'confirmed' ? 'Confirme' : 'En attente'}
