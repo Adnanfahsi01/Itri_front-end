@@ -62,7 +62,7 @@ export default function Hero() {
           <button
             className="btn btn-outline-white"
             onClick={() => window.open('https://www.google.com/maps/search/?api=1&query=P5V3%2BCCW,+Tanger', '_blank')}
-            style={{ padding: '14px 32px', borderRadius: '50px', border: '2px solid white', backgroundColor: 'transparent', color: 'white', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}
+            style={{ padding: '14px 32px', borderRadius: '50px', border: '2px solid white', backgroundColor: 'transparent', color: 'white', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
@@ -71,6 +71,7 @@ export default function Hero() {
             Location
           </button>
         </div>
+        <p className="hero-event-dates">1, 2 and 3 avril 2026</p>
       </div>
     </section>
   );
