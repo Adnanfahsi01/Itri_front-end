@@ -291,11 +291,11 @@ function Reservation() {
   return (
     <div className="min-h-screen py-16 pt-32">
       {/* Header */}
-      <div className="container mx-auto px-6 mb-16 text-center">
-        <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
+      <div className="container mx-auto px-6 mb-24 text-center">
+        <h1 className="text-4xl md:text-5xl font-bold text-white mb-7">
           Réservez Votre Place
         </h1>
-        <p className="text-lg text-slate-400 max-w-3xl mx-auto">
+        <p className="text-lg text-slate-400 max-w-3xl mx-auto leading-relaxed">
           Sélectionnez les jours auxquels vous souhaitez participer, puis remplissez le formulaire pour compléter votre réservation.
         </p>
       </div>
@@ -346,11 +346,11 @@ function Reservation() {
         </div>
       )}
 
-      <div className="container mx-auto px-6 mt-8 mb-20">
+      <div className="container mx-auto px-6 mt-12 mb-20">
         <div className="max-w-2xl mx-auto bg-slate-800 border border-slate-700 p-8 md:p-10 rounded-2xl shadow-xl">
           {/* Day Selector */}
           <div className="mb-8 border-b border-slate-700 pb-8">
-            <h2 className="text-2xl font-bold text-blue-300 mb-6 text-center">1. Sélectionnez le(s) jour(s)</h2>
+            <h2 className="text-2xl font-bold text-blue-300 mb-8 text-center">1. Sélectionnez le(s) jour(s)</h2>
 
               {/* Day Selector */}
               <div className="mb-6">
@@ -396,7 +396,7 @@ function Reservation() {
 
           {/* Reservation Form */}
           <div>
-            <h2 className="text-2xl font-bold text-blue-300 mb-6 text-center">
+            <h2 className="text-2xl font-bold text-blue-300 mb-8 text-center">
                 {showWaitlistForm ? "2. Informations pour Liste d'Attente" : "2. Vos Informations"}
               </h2>
 
@@ -486,7 +486,7 @@ function Reservation() {
                 <div className="pt-2">
                   <p className="text-sm text-muted mb-4">
                     <span className="font-semibold text-slate-300">Jour(s) sélectionné(s):</span>{' '}
-                    <span className="text-primary font-bold">
+                    <span className="text-secondary font-bold">
                       {selectedDays.length === 2
                         ? 'Les 2 Jours'
                         : selectedDays.map(d => d === 'day1' ? 'Jour 1' : 'Jour 2').join(', ')}

@@ -40,8 +40,8 @@ function Speakers() {
   return (
     <div className="min-h-screen py-16 pt-32">
       {/* Header */}
-      <div className="container mx-auto px-6 mb-28 text-center">
-        <h1 className="text-5xl font-bold text-center text-white mb-8">
+      <div className="container mx-auto px-6 mb-32 text-center">
+        <h1 className="text-5xl font-bold text-center text-white mb-10">
           Our Speakers
         </h1>
         <p className="text-lg text-center text-slate-400 max-w-4xl mx-auto leading-relaxed">
@@ -51,7 +51,7 @@ function Speakers() {
       </div>
 
       {/* Speakers Grid */}
-      <div className="container mx-auto px-6 mt-24">
+      <div className="container mx-auto px-6 mt-28">
         {speakers.length === 0 ? (
           <div className="text-center py-16">
             <p className="text-xl text-muted">
@@ -91,7 +91,7 @@ function Speakers() {
                   <h3 className="text-2xl font-bold text-white mb-2">
                     {speaker.name}
                   </h3>
-                  <p className="text-primary font-semibold mb-4">
+                  <p className="text-secondary font-semibold mb-4">
                     {speaker.job_title}
                   </p>
                   <p className="text-slate-400 leading-relaxed">
