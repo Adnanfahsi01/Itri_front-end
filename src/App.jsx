@@ -19,10 +19,12 @@ import AdminHackathon from './pages/admin/AdminHackathon';
 import HackathonRegistration from './pages/HackathonRegistration';
 import HackathonMemberConfirmation from './pages/HackathonMemberConfirmation';
 import AdminRoute from './components/AdminRoute';
+import ScrollToTop from './components/ScrollToTop';
 
 function App() {
   return (
     <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+      <ScrollToTop />
       <Routes>
         {/* Admin Routes (without navbar/footer) */}
         <Route path="/admin/login" element={<AdminLogin />} />

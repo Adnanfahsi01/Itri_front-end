@@ -33,7 +33,7 @@ export default function Hero() {
 
       <div className="hero-content">
         <div className="hero-badge">
-          ✨ THE PREMIER TECH EVENT
+          ✨ THE LEADING TECH EVENT
         </div>
 
         <h1 className="hero-title" style={{ color: 'white', fontSize: '3rem' }}>
@@ -71,7 +71,7 @@ export default function Hero() {
             Location
           </button>
         </div>
-        <p className="hero-event-dates">1, 2 and 3 avril 2026</p>
+        <p className="hero-event-dates">1, 2 and 3 april 2026</p>
 
         <div className="hero-socials" aria-label="Social media links">
           <a
