@@ -17,6 +17,7 @@ import AdminQRScanner from './pages/admin/AdminQRScanner';
 import AdminScanStats from './pages/admin/AdminScanStats';
 import AdminHackathon from './pages/admin/AdminHackathon';
 import HackathonRegistration from './pages/HackathonRegistration';
+import HackathonMemberConfirmation from './pages/HackathonMemberConfirmation';
 import AdminRoute from './components/AdminRoute';
 
 function App() {
@@ -50,6 +51,7 @@ function App() {
                 <Route path="/confirm-reservation" element={<ConfirmReservation />} />
                 <Route path="/cancel-reservation" element={<CancelReservation />} />
                 <Route path="/hackathon" element={<HackathonRegistration />} />
+                <Route path="/hackathon/member-confirmation/:token" element={<HackathonMemberConfirmation />} />
               </Routes>
               <Footer />
             </>

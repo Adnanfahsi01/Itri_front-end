@@ -2,17 +2,18 @@ import { useState } from 'react';
 import jsPDF from 'jspdf';
 import QRCode from 'qrcode';
 import { registerHackathon } from '../utils/api';
-import Navbar from '../components/Navbar';
-import Footer from '../components/Footer';
-import Background from '../components/Background';
 
 function HackathonRegistration() {
+  const [nextMemberId, setNextMemberId] = useState(1);
   const [formData, setFormData] = useState({
     nom: '',
     prenom: '',
     cni: '',
     email: '',
     phone: '',
+    registration_type: 'solo',
+    team_name: '',
+    members: [],
     fonctionnalite: 'etudiant',
     etablissement: '',
     entreprise: '',
@@ -21,6 +22,7 @@ function HackathonRegistration() {
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState('');
+  const [inviteLinks, setInviteLinks] = useState([]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -30,6 +32,33 @@ function HackathonRegistration() {
       // Clear conditional fields when switching role
       ...(name === 'fonctionnalite' && value === 'etudiant' ? { entreprise: '' } : {}),
       ...(name === 'fonctionnalite' && value === 'employer' ? { etablissement: '' } : {}),
+      ...(name === 'registration_type' && value === 'solo' ? { team_name: '', members: [] } : {}),
+    }));
+  };
+
+  const addMember = () => {
+    const memberId = nextMemberId;
+    setNextMemberId((prev) => prev + 1);
+
+    setFormData((prev) => ({
+      ...prev,
+      members: [...prev.members, { client_id: memberId, full_name: '', email: '' }],
+    }));
+  };
+
+  const removeMember = (memberId) => {
+    setFormData((prev) => ({
+      ...prev,
+      members: prev.members.filter((member) => member.client_id !== memberId),
+    }));
+  };
+
+  const handleMemberChange = (memberId, field, value) => {
+    setFormData((prev) => ({
+      ...prev,
+      members: prev.members.map((member) =>
+        member.client_id === memberId ? { ...member, [field]: value } : member
+      ),
     }));
   };
 
@@ -149,17 +178,62 @@ function HackathonRegistration() {
     e.preventDefault();
     setSubmitting(true);
     setError('');
+    setInviteLinks([]);
+
+    const cleanedMembers = formData.members
+      .map((member) => ({
+        full_name: member.full_name.trim(),
+        email: member.email.trim(),
+      }))
+      .filter((member) => member.full_name && member.email);
+
+    const hasPartialRows = formData.members.some((member) => {
+      const fullName = member.full_name.trim();
+      const memberEmail = member.email.trim();
+
+      return (fullName || memberEmail) && (!fullName || !memberEmail);
+    });
+
+    if (hasPartialRows) {
+      setSubmitting(false);
+      setError('Chaque membre ajoute doit avoir un nom complet et un email.');
+      return;
+    }
+
+    const invalidMember = cleanedMembers.find(
+      (member) => !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(member.email)
+    );
+
+    if (invalidMember) {
+      setSubmitting(false);
+      setError(`Email membre invalide: ${invalidMember.email}`);
+      return;
+    }
+
+    if (formData.registration_type === 'team' && cleanedMembers.length === 0) {
+      setSubmitting(false);
+      setError('Ajoutez au moins un membre avec nom complet et email.');
+      return;
+    }
     
     try {
-      const response = await registerHackathon(formData);
+      const payload = {
+        ...formData,
+        members: formData.registration_type === 'team' ? cleanedMembers : [],
+      };
+
+      const response = await registerHackathon(payload);
       
       if (response.data && response.data.data) {
         await generatePDFTicket(response.data.data, formData);
       }
 
+      setInviteLinks(response.data?.invite_links || []);
+
       setSuccess(true);
       setFormData({
         nom: '', prenom: '', cni: '', email: '', phone: '',
+        registration_type: 'solo', team_name: '', members: [],
         fonctionnalite: 'etudiant', etablissement: '', entreprise: ''
       });
       window.scrollTo(0, 0);
@@ -196,6 +270,26 @@ function HackathonRegistration() {
             </div>
             <p className="text-lg mb-2">Votre inscription a bien été enregistrée avec succès. Après étude de votre candidature, vous serez contacté par e-mail, WhatsApp ou téléphone afin de confirmer votre participation.</p>
             <p className="text-sm font-bold opacity-80 mt-4">Votre reçu d'inscription a été téléchargé automatiquement en format PDF.</p>
+            {inviteLinks.length > 0 && (
+              <div className="mt-6 text-left bg-slate-900/30 border border-slate-700 rounded-lg p-4">
+                <p className="font-bold mb-3">Liens d'invitation a partager avec vos membres:</p>
+                <div className="space-y-3">
+                  {inviteLinks.map((invite) => (
+                    <div key={invite.email} className="bg-slate-950/30 p-3 rounded-lg border border-slate-700/50">
+                      <p className="text-sm font-semibold">{invite.member} ({invite.email})</p>
+                      <p className="text-xs break-all text-slate-300 mt-1">{invite.link}</p>
+                      <button
+                        type="button"
+                        onClick={() => navigator.clipboard.writeText(invite.link)}
+                        className="mt-2 px-3 py-1.5 bg-primary text-white text-xs font-semibold rounded-md hover:bg-opacity-90 transition-all"
+                      >
+                        Copier le lien
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -273,6 +367,87 @@ function HackathonRegistration() {
                 className="w-full px-4 py-2 bg-slate-700 text-white border border-slate-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
               />
             </div>
+
+            <div>
+              <label className="block text-sm font-semibold mb-2 text-slate-300">Participation *</label>
+              <select
+                name="registration_type"
+                value={formData.registration_type}
+                onChange={handleInputChange}
+                required
+                className="w-full px-4 py-2 bg-slate-700 text-white border border-slate-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+              >
+                <option value="solo">Solo</option>
+                <option value="team">Avec equipe</option>
+              </select>
+            </div>
+
+            {formData.registration_type === 'team' && (
+              <>
+                <div>
+                  <label className="block text-sm font-semibold mb-2 text-slate-300">Nom de l'equipe *</label>
+                  <input
+                    type="text"
+                    name="team_name"
+                    value={formData.team_name}
+                    onChange={handleInputChange}
+                    required
+                    className="w-full px-4 py-2 bg-slate-700 text-white border border-slate-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                  />
+                </div>
+
+                <div className="space-y-3 border border-slate-700 rounded-xl p-4 bg-slate-900/30">
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm font-semibold text-slate-200">Membres de l'equipe</p>
+                    <button
+                      type="button"
+                      onClick={addMember}
+                      className="px-3 py-1.5 bg-slate-700 text-white text-xs font-semibold rounded-md hover:bg-slate-600 transition-all"
+                    >
+                      Ajouter un membre
+                    </button>
+                  </div>
+
+                  {formData.members.length === 0 ? (
+                    <p className="text-xs text-slate-400">Ajoutez les membres que vous souhaitez inviter.</p>
+                  ) : (
+                    <div className="space-y-3">
+                      {formData.members.map((member) => (
+                        <div key={member.client_id} className="grid md:grid-cols-2 gap-3 items-end bg-slate-950/30 p-3 rounded-lg border border-slate-700/50">
+                          <div>
+                            <label className="block text-xs font-semibold mb-1 text-slate-300">Nom complet *</label>
+                            <input
+                              type="text"
+                              value={member.full_name}
+                              onChange={(e) => handleMemberChange(member.client_id, 'full_name', e.target.value)}
+                              className="w-full px-3 py-2 bg-slate-700 text-white border border-slate-600 rounded-lg text-sm focus:ring-2 focus:ring-primary focus:border-transparent"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-xs font-semibold mb-1 text-slate-300">Email *</label>
+                            <input
+                              type="email"
+                              value={member.email}
+                              onChange={(e) => handleMemberChange(member.client_id, 'email', e.target.value)}
+                              className="w-full px-3 py-2 bg-slate-700 text-white border border-slate-600 rounded-lg text-sm focus:ring-2 focus:ring-primary focus:border-transparent"
+                            />
+                          </div>
+                          <div className="md:col-span-2 text-right">
+                            <button
+                              type="button"
+                              onClick={() => removeMember(member.client_id)}
+                              className="px-3 py-1.5 bg-red-900/40 text-red-200 text-xs font-semibold rounded-md hover:bg-red-800/50 transition-all"
+                            >
+                              Supprimer
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </>
+            )}
 
             <div>
               <label className="block text-sm font-semibold mb-2 text-slate-300">Fonctionnalité *</label>

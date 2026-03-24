@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { Fragment, useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { getHackathonRegistrations, updateHackathonStatus, deleteHackathonRegistration } from '../../utils/api';
 
@@ -8,6 +8,7 @@ function AdminHackathon() {
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState({
     role: '',
+    participation: '',
     search: '',
   });
 
@@ -31,9 +32,24 @@ function AdminHackathon() {
 
   const filteredRegistrations = registrations.filter(r => {
     if (filters.role && r.fonctionnalite !== filters.role) return false;
+    if (filters.participation && (r.registration_type || 'solo') !== filters.participation) return false;
     if (filters.search) {
       const s = filters.search.toLowerCase();
-      if (!r.nom.toLowerCase().includes(s) && !r.prenom.toLowerCase().includes(s) && !r.email.toLowerCase().includes(s) && !r.cni.toLowerCase().includes(s)) {
+      const leaderMatch =
+        r.nom.toLowerCase().includes(s) ||
+        r.prenom.toLowerCase().includes(s) ||
+        r.email.toLowerCase().includes(s) ||
+        r.cni.toLowerCase().includes(s) ||
+        (r.team_name || '').toLowerCase().includes(s);
+
+      const memberMatch = Array.isArray(r.members)
+        ? r.members.some((member) =>
+            (member.full_name || '').toLowerCase().includes(s) ||
+            (member.email || '').toLowerCase().includes(s)
+          )
+        : false;
+
+      if (!leaderMatch && !memberMatch) {
         return false;
       }
     }
@@ -66,16 +82,15 @@ function AdminHackathon() {
       return;
     }
 
-    const headers = ['Nom', 'Prénom', 'CNI', 'Email', 'Téléphone', 'Fonctionnalité', 'Établissement/Entreprise', 'Statut'];
+    const headers = ['Leader', 'Email Leader', 'Type', 'Equipe', 'Membres', 'Statut', 'Date'];
     const csvData = filteredRegistrations.map(r => [
-      r.nom,
-      r.prenom,
-      r.cni,
+      `${r.prenom} ${r.nom}`,
       r.email,
-      r.phone,
-      r.fonctionnalite === 'etudiant' ? 'Étudiant' : 'Employé',
-      r.fonctionnalite === 'etudiant' ? (r.etablissement || '') : (r.entreprise || ''),
-      r.status === 'confirmed' ? 'Confirmé' : r.status === 'canceled' ? 'Annulé' : 'En attente'
+      (r.registration_type || 'solo') === 'team' ? 'Equipe' : 'Solo',
+      r.team_name || '-',
+      Array.isArray(r.members) ? r.members.length : 0,
+      r.status === 'confirmed' ? 'Confirme' : r.status === 'canceled' ? 'Annule' : 'En attente',
+      new Date(r.created_at).toLocaleDateString(),
     ]);
 
     const csvContent = "\uFEFF" + headers.join(",") + "\n" + csvData.map(row => row.map(str => `"${String(str).replace(/"/g, '""')}"`).join(",")).join("\n");
@@ -135,7 +150,7 @@ function AdminHackathon() {
         <div className="bg-white/80 backdrop-blur-sm p-6 rounded-[2rem] border border-gray-100 shadow-xl shadow-gray-200/40 mb-10 overflow-hidden relative">
           <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-600/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 relative z-10 w-1/2">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 relative z-10 w-full">
             <div className="space-y-1.5">
               <label className="text-[10px] font-black text-muted uppercase tracking-widest ml-1">Catégorie</label>
               <select
@@ -146,6 +161,19 @@ function AdminHackathon() {
                 <option value="">Tous les rôles</option>
                 <option value="etudiant">Étudiants</option>
                 <option value="employer">Employés</option>
+              </select>
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-black text-muted uppercase tracking-widest ml-1">Type</label>
+              <select
+                value={filters.participation}
+                onChange={(e) => setFilters({ ...filters, participation: e.target.value })}
+                className="w-full px-5 py-3 bg-gray-50/50 border border-gray-100 rounded-xl text-xs font-bold focus:ring-4 focus:ring-indigo-600/10 focus:border-indigo-600 focus:bg-white transition-all outline-none text-gray-700"
+              >
+                <option value="">Tous</option>
+                <option value="solo">Solo</option>
+                <option value="team">Equipe</option>
               </select>
             </div>
 
@@ -172,20 +200,21 @@ function AdminHackathon() {
             <table className="w-full">
               <thead>
                 <tr className="bg-gray-50/50 border-b border-gray-100">
-                  <th className="text-left py-6 px-8 text-[10px] font-black uppercase text-muted tracking-widest">Participant</th>
+                  <th className="text-left py-6 px-8 text-[10px] font-black uppercase text-muted tracking-widest">Leader</th>
                   <th className="text-left py-6 px-8 text-[10px] font-black uppercase text-muted tracking-widest">Contact</th>
                   <th className="text-left py-6 px-8 text-[10px] font-black uppercase text-muted tracking-widest">CNI</th>
+                  <th className="text-left py-6 px-8 text-[10px] font-black uppercase text-muted tracking-widest">Type</th>
                   <th className="text-left py-6 px-8 text-[10px] font-black uppercase text-muted tracking-widest">Fonctionnalité</th>
                   <th className="text-left py-6 px-8 text-[10px] font-black uppercase text-muted tracking-widest">Organisation</th>
                   <th className="text-left py-6 px-8 text-[10px] font-black uppercase text-muted tracking-widest">Date Insc.</th>
-                  <th className="text-left py-6 px-8 text-[10px] font-black uppercase text-muted tracking-widest">Statut</th>
+                  <th className="text-left py-6 px-8 text-[10px] font-black uppercase text-muted tracking-widest">Validation</th>
                   <th className="text-right py-6 px-8 text-[10px] font-black uppercase text-muted tracking-widest">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50">
                 {loading ? (
                   <tr>
-                    <td colSpan="8" className="text-center py-20">
+                    <td colSpan="9" className="text-center py-20">
                       <div className="flex flex-col items-center justify-center">
                         <div className="w-12 h-12 border-4 border-indigo-600/20 border-t-indigo-600 rounded-full animate-spin mb-4"></div>
                         <p className="text-xs font-black text-muted uppercase tracking-[0.2em]">Chargement des données...</p>
@@ -194,7 +223,7 @@ function AdminHackathon() {
                   </tr>
                 ) : filteredRegistrations.length === 0 ? (
                   <tr>
-                    <td colSpan="8" className="text-center py-24">
+                    <td colSpan="9" className="text-center py-24">
                       <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6">
                         <svg className="w-10 h-10 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
@@ -205,72 +234,126 @@ function AdminHackathon() {
                   </tr>
                 ) : (
                   filteredRegistrations.map((reservation) => (
-                    <tr key={reservation.id} className="hover:bg-gray-50/50 transition-colors group">
-                      <td className="py-5 px-8">
-                        <div className="font-black text-gray-800 text-sm tracking-tight">{reservation.prenom} {reservation.nom}</div>
-                      </td>
-                      <td className="py-5 px-8">
-                        <div className="text-xs font-bold text-gray-700">{reservation.email}</div>
-                        <div className="text-[10px] text-muted font-bold tracking-tight">{reservation.phone}</div>
-                      </td>
-                      <td className="py-5 px-8">
-                         <div className="text-xs font-bold text-gray-700">{reservation.cni}</div>
-                      </td>
-                      <td className="py-5 px-8">
-                        <span className={`px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest ${reservation.fonctionnalite === 'etudiant' ? 'bg-blue-50 text-blue-600' : 'bg-purple-50 text-purple-600'
+                    <Fragment key={reservation.id}>
+                      <tr className="hover:bg-gray-50/50 transition-colors group">
+                        <td className="py-5 px-8">
+                          <div className="font-black text-gray-800 text-sm tracking-tight">{reservation.prenom} {reservation.nom}</div>
+                          {reservation.team_name && (
+                            <div className="text-[10px] text-indigo-600 font-bold mt-1">{reservation.team_name}</div>
+                          )}
+                        </td>
+                        <td className="py-5 px-8">
+                          <div className="text-xs font-bold text-gray-700">{reservation.email}</div>
+                          <div className="text-[10px] text-muted font-bold tracking-tight">{reservation.phone}</div>
+                        </td>
+                        <td className="py-5 px-8">
+                          <div className="text-xs font-bold text-gray-700">{reservation.cni}</div>
+                        </td>
+                        <td className="py-5 px-8">
+                          <span className={`px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest ${
+                            (reservation.registration_type || 'solo') === 'team'
+                              ? 'bg-indigo-50 text-indigo-600'
+                              : 'bg-slate-100 text-slate-700'
                           }`}>
-                          {reservation.fonctionnalite === 'etudiant' ? 'Étudiant' : 'Employé'}
-                        </span>
-                      </td>
-                      <td className="py-5 px-8">
-                        <div className="text-xs font-bold text-gray-700 uppercase">
-                          {reservation.fonctionnalite === 'etudiant' ? reservation.etablissement : reservation.entreprise}
-                        </div>
-                      </td>
-                      <td className="py-5 px-8">
-                        <div className="text-xs font-bold text-gray-700">{new Date(reservation.created_at).toLocaleDateString()}</div>
-                      </td>
-                      <td className="py-5 px-8">
-                        <span className={`px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest ${
-                          reservation.status === 'confirmed' ? 'bg-green-50 text-green-600 border border-green-200' :
-                          reservation.status === 'canceled' ? 'bg-red-50 text-red-600 border border-red-200' :
-                          'bg-yellow-50 text-yellow-600 border border-yellow-200'
-                        }`}>
-                          {reservation.status === 'confirmed' ? 'Confirmé' : reservation.status === 'canceled' ? 'Annulé' : 'En attente'}
-                        </span>
-                      </td>
-                      <td className="py-5 px-8 text-right">
-                        <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                          {reservation.status !== 'confirmed' && (
+                            {(reservation.registration_type || 'solo') === 'team' ? 'Equipe' : 'Solo'}
+                          </span>
+                        </td>
+                        <td className="py-5 px-8">
+                          <span className={`px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest ${reservation.fonctionnalite === 'etudiant' ? 'bg-blue-50 text-blue-600' : 'bg-purple-50 text-purple-600'
+                            }`}>
+                            {reservation.fonctionnalite === 'etudiant' ? 'Etudiant' : 'Employe'}
+                          </span>
+                        </td>
+                        <td className="py-5 px-8">
+                          <div className="text-xs font-bold text-gray-700 uppercase">
+                            {reservation.fonctionnalite === 'etudiant' ? reservation.etablissement : reservation.entreprise}
+                          </div>
+                        </td>
+                        <td className="py-5 px-8">
+                          <div className="text-xs font-bold text-gray-700">{new Date(reservation.created_at).toLocaleDateString()}</div>
+                        </td>
+                        <td className="py-5 px-8">
+                          <span className={`px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest ${
+                            reservation.status === 'confirmed' ? 'bg-green-50 text-green-600 border border-green-200' :
+                            reservation.status === 'canceled' ? 'bg-red-50 text-red-600 border border-red-200' :
+                            'bg-yellow-50 text-yellow-600 border border-yellow-200'
+                          }`}>
+                            {reservation.status === 'confirmed' ? 'Confirme' : reservation.status === 'canceled' ? 'Annule' : 'En attente'}
+                          </span>
+                        </td>
+                        <td className="py-5 px-8 text-right">
+                          <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                            {reservation.status !== 'confirmed' && (
+                              <button
+                                onClick={() => handleUpdateStatus(reservation.id, 'confirmed')}
+                                className="px-3 py-1.5 bg-green-50 text-green-600 rounded-lg text-xs font-bold hover:bg-green-600 hover:text-white transition-all shadow-sm active:scale-95"
+                                title="Confirmer"
+                              >
+                                Confirmer
+                              </button>
+                            )}
+                            {reservation.status !== 'canceled' && (
+                              <button
+                                onClick={() => handleUpdateStatus(reservation.id, 'canceled')}
+                                className="px-3 py-1.5 bg-yellow-50 text-yellow-600 rounded-lg text-xs font-bold hover:bg-yellow-600 hover:text-white transition-all shadow-sm active:scale-95"
+                                title="Annuler"
+                              >
+                                Annuler
+                              </button>
+                            )}
                             <button
-                              onClick={() => handleUpdateStatus(reservation.id, 'confirmed')}
-                              className="px-3 py-1.5 bg-green-50 text-green-600 rounded-lg text-xs font-bold hover:bg-green-600 hover:text-white transition-all shadow-sm active:scale-95"
-                              title="Confirmer"
+                              onClick={() => handleDelete(reservation.id)}
+                              className="p-1.5 bg-red-50 text-red-600 rounded-lg hover:bg-red-600 hover:text-white transition-all shadow-sm active:scale-95"
+                              title="Supprimer"
                             >
-                              Confirmer
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                              </svg>
                             </button>
-                          )}
-                          {reservation.status !== 'canceled' && (
-                            <button
-                              onClick={() => handleUpdateStatus(reservation.id, 'canceled')}
-                              className="px-3 py-1.5 bg-yellow-50 text-yellow-600 rounded-lg text-xs font-bold hover:bg-yellow-600 hover:text-white transition-all shadow-sm active:scale-95"
-                              title="Annuler"
-                            >
-                              Annuler
-                            </button>
-                          )}
-                          <button
-                            onClick={() => handleDelete(reservation.id)}
-                            className="p-1.5 bg-red-50 text-red-600 rounded-lg hover:bg-red-600 hover:text-white transition-all shadow-sm active:scale-95"
-                            title="Supprimer"
-                          >
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                            </svg>
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
+                          </div>
+                        </td>
+                      </tr>
+
+                      {(reservation.registration_type || 'solo') === 'team' && Array.isArray(reservation.members) && reservation.members.length > 0 && (
+                        <tr>
+                          <td colSpan="9" className="px-8 pb-6">
+                            <div className="bg-slate-50 border border-slate-200 rounded-xl p-4">
+                              <p className="text-[10px] font-black text-muted uppercase tracking-widest mb-3">Membres de l'equipe</p>
+                              <div className="overflow-x-auto">
+                                <table className="w-full text-sm">
+                                  <thead>
+                                    <tr className="border-b border-slate-200">
+                                      <th className="text-left py-2 text-[10px] uppercase tracking-widest text-muted">Nom</th>
+                                      <th className="text-left py-2 text-[10px] uppercase tracking-widest text-muted">Email</th>
+                                      <th className="text-left py-2 text-[10px] uppercase tracking-widest text-muted">Statut</th>
+                                      <th className="text-left py-2 text-[10px] uppercase tracking-widest text-muted">Fonctionnalite</th>
+                                      <th className="text-left py-2 text-[10px] uppercase tracking-widest text-muted">Etablissement</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody>
+                                    {reservation.members.map((member) => (
+                                      <tr key={member.id} className="border-b last:border-b-0 border-slate-100">
+                                        <td className="py-2 font-semibold text-gray-800">{member.full_name}</td>
+                                        <td className="py-2 text-gray-700">{member.email}</td>
+                                        <td className="py-2">
+                                          <span className={`px-2 py-1 rounded-md text-[9px] font-black uppercase tracking-wider ${
+                                            member.status === 'confirmed' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'
+                                          }`}>
+                                            {member.status === 'confirmed' ? 'Confirme' : 'En attente'}
+                                          </span>
+                                        </td>
+                                        <td className="py-2 text-gray-700">{member.fonctionnalite || '-'}</td>
+                                        <td className="py-2 text-gray-700">{member.etablissement || '-'}</td>
+                                      </tr>
+                                    ))}
+                                  </tbody>
+                                </table>
+                              </div>
+                            </div>
+                          </td>
+                        </tr>
+                      )}
+                    </Fragment>
                   ))
                 )}
               </tbody>

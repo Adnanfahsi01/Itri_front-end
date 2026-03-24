@@ -12,12 +12,36 @@ const api = axios.create({
   },
 });
 
+const isPublicEndpoint = (url = '', method = 'get') => {
+  const path = String(url).split('?')[0];
+  const normalizedMethod = method.toLowerCase();
+
+  if (path === '/admin/login') return true;
+
+  if (path.startsWith('/hackathon/register')) return normalizedMethod === 'post';
+  if (path.startsWith('/hackathon/member-invitations/')) return true;
+
+  if (path.startsWith('/speakers')) return normalizedMethod === 'get';
+  if (path.startsWith('/programs')) return normalizedMethod === 'get';
+  if (path.startsWith('/seats')) return normalizedMethod === 'get';
+  if (path === '/waitlist') return normalizedMethod === 'post';
+  if (path.startsWith('/tickets/')) return normalizedMethod === 'get';
+
+  if (normalizedMethod === 'post' && ['/reservations', '/reservations/confirm', '/reservations/cancel'].includes(path)) {
+    return true;
+  }
+
+  return false;
+};
+
 // Add auth token to requests if available
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('adminToken');
   console.log('API Request:', config.method?.toUpperCase(), config.url);
   console.log('Token found:', token ? 'Yes' : 'No');
-  if (token) {
+  const skipAuth = config.skipAuth === true || isPublicEndpoint(config.url, config.method);
+
+  if (token && !skipAuth) {
     config.headers.Authorization = `Bearer ${token}`;
     console.log('Authorization header set');
   }
@@ -34,7 +58,9 @@ export const cancelReservation = (token) => api.post('/reservations/cancel', { t
 export const submitWaitlist = (data) => api.post('/waitlist', data);
 
 // Hackathon
-export const registerHackathon = (data) => api.post('/hackathon/register', data);
+export const registerHackathon = (data) => api.post('/hackathon/register', data, { skipAuth: true });
+export const getHackathonMemberInvitation = (token) => api.get(`/hackathon/member-invitations/${token}`, { skipAuth: true });
+export const confirmHackathonMemberInvitation = (token, data) => api.post(`/hackathon/member-invitations/${token}/confirm`, data, { skipAuth: true });
 export const getHackathonRegistrations = () => api.get('/admin/hackathons');
 export const updateHackathonStatus = (id, status) => api.put(`/admin/hackathons/${id}/status`, { status });
 export const deleteHackathonRegistration = (id) => api.delete(`/admin/hackathons/${id}`);
