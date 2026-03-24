@@ -23,7 +23,7 @@
   padding: 10px 20px;
   border-radius: 50px;
   border: 1px solid rgba(255, 255, 255, 0.12);
-  overflow: hidden;
+  overflow: visible;
 }
 
 .navbar-floating-logo img {
@@ -110,5 +110,6 @@
     border-radius: 20px;
     border: 1px solid rgba(255, 255, 255, 0.12);
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    z-index: 1001;
   }
 }
