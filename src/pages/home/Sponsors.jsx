@@ -4,6 +4,7 @@ import LogoLoop from './../../components/LogoLoop';
 const imageLogos = [
   { src: '/cadimage.png', alt: 'CAD Sponsor' },
   { src: '/tangerimg.png', alt: 'Tanger Sponsor' },
+  { src: '/americancenter.png', alt: 'American Center Sponsor' },
 ];
 
 export default function Sponsors() {
@@ -14,7 +15,7 @@ export default function Sponsors() {
         logos={imageLogos}
         speed={70}
         direction="left"
-        logoHeight={150}
+        logoHeight={190}
         gap={58}
         pauseOnHover
         hoverSpeed={0}
