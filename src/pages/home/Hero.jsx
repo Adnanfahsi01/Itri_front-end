@@ -72,6 +72,32 @@ export default function Hero() {
           </button>
         </div>
         <p className="hero-event-dates">1, 2 and 3 avril 2026</p>
+
+        <div className="hero-socials" aria-label="Social media links">
+          <a
+            href="https://www.instagram.com/itri_ai_event?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw=="
+            target="_blank"
+            rel="noreferrer noopener"
+            className="hero-social-link"
+            aria-label="Instagram"
+          >
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M7.5 2h9A5.5 5.5 0 0 1 22 7.5v9a5.5 5.5 0 0 1-5.5 5.5h-9A5.5 5.5 0 0 1 2 16.5v-9A5.5 5.5 0 0 1 7.5 2Zm0 2A3.5 3.5 0 0 0 4 7.5v9A3.5 3.5 0 0 0 7.5 20h9a3.5 3.5 0 0 0 3.5-3.5v-9A3.5 3.5 0 0 0 16.5 4h-9Zm9.75 1.5a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5ZM12 7a5 5 0 1 1 0 10 5 5 0 0 1 0-10Zm0 2a3 3 0 1 0 0 6 3 3 0 0 0 0-6Z" />
+            </svg>
+          </a>
+
+          <a
+            href="https://www.linkedin.com/in/ai-itri-ntic-event-15ba803a7"
+            target="_blank"
+            rel="noreferrer noopener"
+            className="hero-social-link"
+            aria-label="LinkedIn"
+          >
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M6.94 8.5A1.56 1.56 0 1 1 6.93 5.4a1.56 1.56 0 0 1 .01 3.1ZM5.56 9.9h2.77V19H5.56V9.9Zm4.6 0h2.66v1.24h.04c.37-.7 1.27-1.44 2.62-1.44 2.8 0 3.32 1.84 3.32 4.24V19h-2.77v-4.5c0-1.07-.02-2.45-1.5-2.45-1.5 0-1.73 1.16-1.73 2.37V19h-2.77V9.9Z" />
+            </svg>
+          </a>
+        </div>
       </div>
     </section>
   );

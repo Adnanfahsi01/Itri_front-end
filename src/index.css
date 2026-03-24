@@ -18,6 +18,14 @@ body {
   color: #f8fafc;
 }
 
+html,
+body,
+#root {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
 /* Smooth transitions for all interactive elements */
 button,
 a,
