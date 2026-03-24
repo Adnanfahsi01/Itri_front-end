@@ -19,8 +19,26 @@ function AdminHackathonScanner() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [lastScannedCode, setLastScannedCode] = useState(null);
   const [scannerBuffer, setScannerBuffer] = useState('');
-  const lastKeyTime = useRef(Date.now());
+  const manualInputRef = useRef(null);
+  const hardwareBufferRef = useRef('');
+  const hardwareFlushTimeoutRef = useRef(null);
   const scanTimeoutRef = useRef(null);
+
+  const flushHardwareBuffer = (force = false) => {
+    const rawValue = hardwareBufferRef.current.trim();
+    hardwareBufferRef.current = '';
+    setScannerBuffer('');
+
+    if (!rawValue) {
+      return;
+    }
+
+    if (!force && rawValue.length < 6) {
+      return;
+    }
+
+    handleHardwareScan(rawValue);
+  };
 
   useEffect(() => {
     // Check if admin is logged in
@@ -30,10 +48,17 @@ function AdminHackathonScanner() {
       return;
     }
 
+    if (manualInputRef.current) {
+      manualInputRef.current.focus();
+    }
+
     return () => {
       // Clear timeout on unmount
       if (scanTimeoutRef.current) {
         clearTimeout(scanTimeoutRef.current);
+      }
+      if (hardwareFlushTimeoutRef.current) {
+        clearTimeout(hardwareFlushTimeoutRef.current);
       }
     };
   }, [navigate]);
@@ -41,39 +66,56 @@ function AdminHackathonScanner() {
   // Hardware Scanner Listener
   useEffect(() => {
     const handleKeyDown = (e) => {
-      // Ignore if user is typing in an input field
-      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+      if (e.defaultPrevented || e.altKey || e.ctrlKey || e.metaKey || isProcessing || loading) {
         return;
       }
 
-      const currentTime = Date.now();
-      const timeDiff = currentTime - lastKeyTime.current;
-      lastKeyTime.current = currentTime;
+      const target = e.target;
+      const isEditableTarget =
+        target instanceof HTMLElement &&
+        (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable);
 
-      // Physical scanners input characters very fast (< 50ms per keypress)
-      // If time interval > 100ms, it is probably human typing; reset the buffer.
-      if (timeDiff > 100) {
-        if (e.key.length === 1) {
-          setScannerBuffer(e.key);
-        } else {
-          setScannerBuffer('');
-        }
-      } else {
-        if (e.key === 'Enter') {
+      if (isEditableTarget) {
+        return;
+      }
+
+      if (e.key === 'Enter' || e.key === 'Tab') {
+        if (hardwareBufferRef.current.length >= 6) {
           e.preventDefault();
-          if (scannerBuffer.length > 5) {
-            handleHardwareScan(scannerBuffer);
-          }
-          setScannerBuffer('');
-        } else if (e.key.length === 1) {
-          setScannerBuffer(prev => prev + e.key);
+          flushHardwareBuffer(true);
         }
+        return;
+      }
+
+      if (e.key === 'Escape') {
+        hardwareBufferRef.current = '';
+        setScannerBuffer('');
+        return;
+      }
+
+      if (e.key.length === 1) {
+        hardwareBufferRef.current += e.key;
+        setScannerBuffer(hardwareBufferRef.current.slice(-64));
+
+        if (hardwareFlushTimeoutRef.current) {
+          clearTimeout(hardwareFlushTimeoutRef.current);
+        }
+
+        // Auto-submit scanners that do not append Enter.
+        hardwareFlushTimeoutRef.current = setTimeout(() => {
+          flushHardwareBuffer(false);
+        }, 70);
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [scannerBuffer, isProcessing]);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      if (hardwareFlushTimeoutRef.current) {
+        clearTimeout(hardwareFlushTimeoutRef.current);
+      }
+    };
+  }, [isProcessing, loading]);
 
   const extractTicketCode = (rawText) => {
     if (!rawText) return "";
@@ -312,8 +354,14 @@ function AdminHackathonScanner() {
     setError(null);
     setIsProcessing(false);
     setLastScannedCode(null);
+    hardwareBufferRef.current = '';
+    setScannerBuffer('');
 
     setScanning(true);
+
+    if (manualInputRef.current) {
+      manualInputRef.current.focus();
+    }
   };
 
   const handleCameraChange = (cameraId) => {
@@ -491,6 +539,7 @@ function AdminHackathonScanner() {
               <form onSubmit={handleManualValidation} className="flex gap-4">
                 <div className="relative flex-1 group">
                   <input
+                    ref={manualInputRef}
                     type="text"
                     value={manualCode}
                     onChange={(e) => setManualCode(e.target.value.toUpperCase())}
