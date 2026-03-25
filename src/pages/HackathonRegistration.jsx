@@ -114,10 +114,10 @@ function HackathonRegistration() {
     doc.setTextColor(255, 255, 255);
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(11);
-    doc.text('HACKATHON AI ITRI', 50, 9.5, { align: 'center', letterSpacing: 0.5 });
+    doc.text('HACKATHON ITRI AI EVENT', 50, 9.5, { align: 'center', letterSpacing: 0.5 });
     
     doc.setFont('helvetica', 'normal');
-    doc.setFontSize(7);
+    doc.setFontSize(8.5);
     doc.setTextColor(200, 200, 255); // Light blue tint for the date
     doc.text('3 AVRIL 2026 • TANGER', 50, 14.5, { align: 'center', letterSpacing: 0.5 });
 

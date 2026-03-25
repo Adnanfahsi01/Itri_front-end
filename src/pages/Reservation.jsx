@@ -188,10 +188,10 @@ function Reservation() {
     doc.setTextColor(255, 255, 255);
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(24);
-    doc.text('AI ITRI NTIC EVENT', 15, 22);
+    doc.text('ITRI AI EVENT', 15, 22);
 
     // Event Date & Location
-    doc.setFontSize(10);
+    doc.setFontSize(11);
     doc.setTextColor(234, 179, 8); // Yellow 500
     doc.text('1 - 3 APRIL 2026 | TANGIER, MOROCCO', 15, 30);
 
@@ -238,7 +238,7 @@ function Reservation() {
     doc.setTextColor(51, 65, 85); // Slate 700
     doc.setGState(new doc.GState({ opacity: 0.15 }));
     doc.setFontSize(40);
-    doc.text('ITRI TECH', 75, 40, { align: 'center', angle: -20 });
+    doc.text('ITRI AI EVENT', 75, 40, { align: 'center', angle: -20 });
     doc.setGState(new doc.GState({ opacity: 1.0 }));
 
     // --- PERFORATION LINE ---

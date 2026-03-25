@@ -46,7 +46,7 @@ function Speakers() {
         </h1>
         <p className="text-lg text-center text-slate-400 max-w-4xl mx-auto leading-relaxed">
           Meet the industry experts and thought leaders who will share their knowledge
-          and insights at AI ITRI NTIC EVENT.
+          and insights at ITRI AI EVENT.
         </p>
       </div>
 

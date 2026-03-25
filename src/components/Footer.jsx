@@ -7,7 +7,7 @@ function Footer() {
         <div className="grid md:grid-cols-3 gap-12">
           {/* Event Info */}
           <div>
-            <h3 className="text-2xl font-bold mb-6 text-white">AI ITRI NTIC EVENT</h3>
+            <h3 className="text-2xl font-bold mb-6 text-white">ITRI AI EVENT</h3>
             <p className="text-slate-400 leading-relaxed">
               Join us for three days of innovation, learning, and networking at Tanger, Morocco.
             </p>
@@ -59,7 +59,7 @@ function Footer() {
         </div>
 
         <div className="border-t border-slate-800 mt-12 pt-8 text-center text-slate-500 text-sm">
-          <p>&copy; {new Date().getFullYear()} AI ITRI NTIC EVENT. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} ITRI AI EVENT. All rights reserved.</p>
         </div>
       </div>
     </footer>

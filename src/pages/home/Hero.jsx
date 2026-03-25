@@ -37,7 +37,7 @@ export default function Hero() {
         </div>
 
         <h1 className="hero-title" style={{ color: 'white', fontSize: '3rem' }}>
-          AI ITRI NTIC EVENT
+          ITRI AI EVENT
         </h1>
 
         <div className="hero-subtitle" style={{ color: 'white', fontSize: '1.5rem' }}>
