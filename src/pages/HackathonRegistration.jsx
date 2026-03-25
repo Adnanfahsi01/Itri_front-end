@@ -4,7 +4,7 @@ import QRCode from 'qrcode';
 import { registerHackathon } from '../utils/api';
 
 function HackathonRegistration() {
-  const MAX_INVITED_MEMBERS = 2;
+  const MAX_INVITED_MEMBERS = 4;
   const [nextMemberId, setNextMemberId] = useState(1);
   const [formData, setFormData] = useState({
     nom: '',
@@ -39,7 +39,7 @@ function HackathonRegistration() {
 
   const addMember = () => {
     if (formData.members.length >= MAX_INVITED_MEMBERS) {
-      setError('Maximum 2 membres invites (leader + 2 membres).');
+      setError('Maximum 4 membres invites (leader + 4 = 5).');
       return;
     }
 
@@ -231,7 +231,7 @@ function HackathonRegistration() {
 
     if (formData.registration_type === 'team' && cleanedMembers.length > MAX_INVITED_MEMBERS) {
       setSubmitting(false);
-      setError('Maximum 2 membres invites (leader + 2 membres).');
+      setError('Maximum 4 membres invites (leader + 4 = 5).');
       return;
     }
     
@@ -443,7 +443,7 @@ function HackathonRegistration() {
                     </button>
                   </div>
 
-                  <p className="text-[11px] text-slate-400">Maximum: 2 membres invites (leader + 2).</p>
+                  <p className="text-[11px] text-slate-400">Maximum: 4 membres invites (leader + 4 = 5).</p>
 
                   {formData.members.length === 0 ? (
                     <p className="text-xs text-slate-400">Ajoutez les membres que vous souhaitez inviter.</p>
