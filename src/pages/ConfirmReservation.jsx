@@ -13,7 +13,7 @@ function ConfirmReservation() {
             handleConfirmation();
         } else {
             setStatus('error');
-            setMessage('Jeton de confirmation manquant.');
+            setMessage('Missing confirmation token.');
         }
     }, [token]);
 
@@ -24,7 +24,7 @@ function ConfirmReservation() {
             setMessage(response.data.message);
         } catch (error) {
             setStatus('error');
-            setMessage(error.response?.data?.message || 'Une erreur est survenue lors de la confirmation.');
+            setMessage(error.response?.data?.message || 'An error occurred during confirmation.');
         }
     };
 
@@ -34,7 +34,7 @@ function ConfirmReservation() {
                 {status === 'processing' && (
                     <div className="flex flex-col items-center">
                         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mb-4"></div>
-                        <h2 className="text-2xl font-bold text-white tracking-tight">Confirmation en cours...</h2>
+                        <h2 className="text-2xl font-bold text-white tracking-tight">Confirmation in progress...</h2>
                     </div>
                 )}
 
@@ -45,13 +45,13 @@ function ConfirmReservation() {
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
                             </svg>
                         </div>
-                        <h2 className="text-2xl font-bold text-white mb-4">Confirmé !</h2>
+                        <h2 className="text-2xl font-bold text-white mb-4">Confirmed!</h2>
                         <p className="text-slate-400 mb-8">{message}</p>
                         <Link
                             to="/"
                             className="inline-block bg-primary text-white px-8 py-3 rounded-full font-bold hover:bg-accent transition-colors"
                         >
-                            Retour à l'accueil
+                            Back to home
                         </Link>
                     </div>
                 )}
@@ -63,13 +63,13 @@ function ConfirmReservation() {
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
                             </svg>
                         </div>
-                        <h2 className="text-2xl font-bold text-white mb-4">Erreur</h2>
+                        <h2 className="text-2xl font-bold text-white mb-4">Error</h2>
                         <p className="text-red-400 mb-8">{message}</p>
                         <Link
                             to="/reservation"
                             className="inline-block bg-primary text-white px-8 py-3 rounded-full font-bold hover:bg-accent transition-colors"
                         >
-                            Réessayer la réservation
+                            Try reservation again
                         </Link>
                     </div>
                 )}

@@ -39,7 +39,7 @@ function HackathonRegistration() {
 
   const addMember = () => {
     if (formData.members.length >= MAX_INVITED_MEMBERS) {
-      setError('Maximum 4 membres invites (leader + 4 = 5).');
+      setError('Maximum 4 invited members (leader + 4 = 5).');
       return;
     }
 
@@ -133,7 +133,7 @@ function HackathonRegistration() {
     doc.setTextColor(33, 39, 123); // #21277B
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(10);
-    const role = submittedData.fonctionnalite === 'etudiant' ? 'Développeur Étudiant' : 'Professionnel';
+    const role = submittedData.fonctionnalite === 'etudiant' ? 'Student Developer' : 'Professional';
     doc.text(role, 45, 40, { align: 'center' });
 
     // Participant Details
@@ -143,10 +143,10 @@ function HackathonRegistration() {
     
     const orgaName = submittedData.fonctionnalite === 'etudiant' ? submittedData.etablissement : submittedData.entreprise;
     let currentY = 50;
-    const labelOrg = submittedData.fonctionnalite === 'etudiant' ? 'Établissement: ' : 'Entreprise: ';
+    const labelOrg = submittedData.fonctionnalite === 'etudiant' ? 'Institution: ' : 'Company: ';
     doc.text(`${labelOrg} ${orgaName || 'N/A'}`, 45, currentY, { align: 'center' });
     currentY += 6;
-    doc.text(`Tél: ${submittedData.phone}`, 45, currentY, { align: 'center' });
+    doc.text(`Phone: ${submittedData.phone}`, 45, currentY, { align: 'center' });
     currentY += 6;
     doc.text(`Email: ${submittedData.email}`, 45, currentY, { align: 'center' });
 
@@ -162,7 +162,7 @@ function HackathonRegistration() {
     // QR text
     doc.setTextColor(136, 136, 136); // #888
     doc.setFontSize(7);
-    doc.text("Scannez pour valider l'accès", 45, 116, { align: 'center' });
+    doc.text('Scan to validate access', 45, 116, { align: 'center' });
 
     // Footer (#333)
     doc.setFillColor(51, 51, 51);
@@ -203,7 +203,7 @@ function HackathonRegistration() {
 
     if (hasPartialRows) {
       setSubmitting(false);
-      setError('Chaque membre ajoute doit avoir un nom complet et un email.');
+      setError('Each added member must have a full name and an email.');
       return;
     }
 
@@ -213,25 +213,25 @@ function HackathonRegistration() {
 
     if (invalidMember) {
       setSubmitting(false);
-      setError(`Email membre invalide: ${invalidMember.email}`);
+      setError(`Invalid member email: ${invalidMember.email}`);
       return;
     }
 
     if (formData.registration_type === 'team' && cleanedMembers.length === 0) {
       setSubmitting(false);
-      setError('Ajoutez au moins un membre avec nom complet et email.');
+      setError('Add at least one member with full name and email.');
       return;
     }
 
     if (formData.registration_type === 'team' && !formData.team_name.trim()) {
       setSubmitting(false);
-      setError('Le nom de l\'equipe est obligatoire pour une inscription en equipe.');
+      setError('Team name is required for team registration.');
       return;
     }
 
     if (formData.registration_type === 'team' && cleanedMembers.length > MAX_INVITED_MEMBERS) {
       setSubmitting(false);
-      setError('Maximum 4 membres invites (leader + 4 = 5).');
+      setError('Maximum 4 invited members (leader + 4 = 5).');
       return;
     }
     
@@ -276,7 +276,7 @@ function HackathonRegistration() {
       } else {
         const backendError = err.response?.data?.error;
         const backendMessage = err.response?.data?.message;
-        setError(backendError || backendMessage || 'Erreur lors de l\'inscription. Veuillez vérifier vos données.');
+        setError(backendError || backendMessage || 'Registration failed. Please check your information.');
       }
     } finally {
       setSubmitting(false);
@@ -287,10 +287,10 @@ function HackathonRegistration() {
     <div className="min-h-screen py-16 pt-32">
       <div className="container mx-auto px-6 mb-12 text-center">
         <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
-          Inscription au Hackathon
+          Hackathon Registration
         </h1>
         <p className="text-lg text-slate-400 max-w-4xl mx-auto leading-relaxed">
-          Le Hackathon AI Tanger est une initiative organisée par ITRIAI dans le but de stimuler l'innovation locale en intelligence artificielle. Face à une ville en pleine transformation - entre le développement du port Tanger Med, l'expansion urbaine et les défis sociaux - cet événement vise à mobiliser la jeunesse estudiantine pour proposer des solutions concrètes et applicables. L'événement s'inscrit dans une vision plus large : faire de Tanger un hub régional de l'innovation technologique, en mettant l'AI au service des problèmes réels de la ville.
+          The AI Tanger Hackathon is an initiative organized by ITRIAI to boost local innovation in artificial intelligence. In a rapidly transforming city, from the growth of Tanger Med to urban expansion and social challenges, this event aims to mobilize students to build practical and impactful solutions. It is part of a broader vision to make Tangier a regional hub for technological innovation, using AI to solve real city problems.
         </p>
       </div>
 
@@ -302,11 +302,11 @@ function HackathonRegistration() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
               </svg>
             </div>
-            <p className="text-lg mb-2">Votre inscription a bien été enregistrée avec succès. Après étude de votre candidature, vous serez contacté par e-mail, WhatsApp ou téléphone afin de confirmer votre participation.</p>
-            <p className="text-sm font-bold opacity-80 mt-4">Votre reçu d'inscription a été téléchargé automatiquement en format PDF.</p>
+            <p className="text-lg mb-2">Your registration has been submitted successfully. After reviewing your application, we will contact you by email, WhatsApp, or phone to confirm your participation.</p>
+            <p className="text-sm font-bold opacity-80 mt-4">Your registration receipt was downloaded automatically as a PDF.</p>
             {inviteLinks.length > 0 && (
               <div className="mt-6 text-left bg-slate-900/30 border border-slate-700 rounded-lg p-4">
-                <p className="font-bold mb-3">Liens d'invitation a partager avec vos membres:</p>
+                <p className="font-bold mb-3">Invitation links to share with your members:</p>
                 <div className="space-y-3">
                   {inviteLinks.map((invite) => (
                     <div key={invite.email} className="bg-slate-950/30 p-3 rounded-lg border border-slate-700/50">
@@ -317,7 +317,7 @@ function HackathonRegistration() {
                         onClick={() => navigator.clipboard.writeText(invite.link)}
                         className="mt-2 px-3 py-1.5 bg-primary text-white text-xs font-semibold rounded-md hover:bg-opacity-90 transition-all"
                       >
-                        Copier le lien
+                        Copy link
                       </button>
                     </div>
                   ))}
@@ -341,7 +341,7 @@ function HackathonRegistration() {
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-semibold mb-2 text-slate-300">Prénom *</label>
+                <label className="block text-sm font-semibold mb-2 text-slate-300">First Name *</label>
                 <input
                   type="text"
                   name="prenom"
@@ -353,7 +353,7 @@ function HackathonRegistration() {
               </div>
 
               <div>
-                <label className="block text-sm font-semibold mb-2 text-slate-300">Nom *</label>
+                <label className="block text-sm font-semibold mb-2 text-slate-300">Last Name *</label>
                 <input
                   type="text"
                   name="nom"
@@ -378,7 +378,7 @@ function HackathonRegistration() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-semibold mb-2 text-slate-300">Téléphone *</label>
+                <label className="block text-sm font-semibold mb-2 text-slate-300">Phone *</label>
                 <input
                   type="tel"
                   name="phone"
@@ -403,7 +403,7 @@ function HackathonRegistration() {
             </div>
 
             <div>
-              <label className="block text-sm font-semibold mb-2 text-slate-300">Participation *</label>
+              <label className="block text-sm font-semibold mb-2 text-slate-300">Participation Type *</label>
               <select
                 name="registration_type"
                 value={formData.registration_type}
@@ -412,14 +412,14 @@ function HackathonRegistration() {
                 className="w-full px-4 py-2 bg-slate-700 text-white border border-slate-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
               >
                 <option value="solo">Solo</option>
-                <option value="team">Avec equipe</option>
+                <option value="team">Team</option>
               </select>
             </div>
 
             {formData.registration_type === 'team' && (
               <>
                 <div>
-                  <label className="block text-sm font-semibold mb-2 text-slate-300">Nom de l'equipe *</label>
+                  <label className="block text-sm font-semibold mb-2 text-slate-300">Team Name *</label>
                   <input
                     type="text"
                     name="team_name"
@@ -432,27 +432,27 @@ function HackathonRegistration() {
 
                 <div className="space-y-3 border border-slate-700 rounded-xl p-4 bg-slate-900/30">
                   <div className="flex items-center justify-between">
-                    <p className="text-sm font-semibold text-slate-200">Membres de l'equipe</p>
+                    <p className="text-sm font-semibold text-slate-200">Team Members</p>
                     <button
                       type="button"
                       onClick={addMember}
                       disabled={formData.members.length >= MAX_INVITED_MEMBERS}
                       className="px-3 py-1.5 bg-slate-700 text-white text-xs font-semibold rounded-md hover:bg-slate-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      Ajouter un membre
+                      Add member
                     </button>
                   </div>
 
-                  <p className="text-[11px] text-slate-400">Maximum: 4 membres invites (leader + 4 = 5).</p>
+                  <p className="text-[11px] text-slate-400">Maximum: 4 invited members (leader + 4 = 5).</p>
 
                   {formData.members.length === 0 ? (
-                    <p className="text-xs text-slate-400">Ajoutez les membres que vous souhaitez inviter.</p>
+                    <p className="text-xs text-slate-400">Add the members you want to invite.</p>
                   ) : (
                     <div className="space-y-3">
                       {formData.members.map((member) => (
                         <div key={member.client_id} className="grid md:grid-cols-2 gap-3 items-end bg-slate-950/30 p-3 rounded-lg border border-slate-700/50">
                           <div>
-                            <label className="block text-xs font-semibold mb-1 text-slate-300">Nom complet *</label>
+                            <label className="block text-xs font-semibold mb-1 text-slate-300">Full Name *</label>
                             <input
                               type="text"
                               value={member.full_name}
@@ -475,7 +475,7 @@ function HackathonRegistration() {
                               onClick={() => removeMember(member.client_id)}
                               className="px-3 py-1.5 bg-red-900/40 text-red-200 text-xs font-semibold rounded-md hover:bg-red-800/50 transition-all"
                             >
-                              Supprimer
+                              Remove
                             </button>
                           </div>
                         </div>
@@ -487,7 +487,7 @@ function HackathonRegistration() {
             )}
 
             <div>
-              <label className="block text-sm font-semibold mb-2 text-slate-300">Fonctionnalité *</label>
+              <label className="block text-sm font-semibold mb-2 text-slate-300">Role *</label>
               <select
                 name="fonctionnalite"
                 value={formData.fonctionnalite}
@@ -495,14 +495,14 @@ function HackathonRegistration() {
                 required
                 className="w-full px-4 py-2 bg-slate-700 text-white border border-slate-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
               >
-                <option value="etudiant">Étudiant</option>
-                <option value="employer">Employé</option>
+                <option value="etudiant">Student</option>
+                <option value="employer">Employee</option>
               </select>
             </div>
 
             {formData.fonctionnalite === 'etudiant' && (
               <div>
-                <label className="block text-sm font-semibold mb-2 text-slate-300">Établissement *</label>
+                <label className="block text-sm font-semibold mb-2 text-slate-300">Institution *</label>
                 <input
                   type="text"
                   name="etablissement"
@@ -516,7 +516,7 @@ function HackathonRegistration() {
 
             {formData.fonctionnalite === 'employer' && (
               <div>
-                <label className="block text-sm font-semibold mb-2 text-slate-300">Entreprise *</label>
+                <label className="block text-sm font-semibold mb-2 text-slate-300">Company *</label>
                 <input
                   type="text"
                   name="entreprise"
@@ -533,7 +533,7 @@ function HackathonRegistration() {
               disabled={submitting}
               className="w-full bg-primary text-white py-3 rounded-lg font-bold text-lg hover:bg-opacity-90 disabled:bg-slate-600 disabled:text-slate-400 disabled:cursor-not-allowed transform hover:scale-[1.02] transition-all"
             >
-              {submitting ? 'Validation en cours...' : 'Valider l\'inscription'}
+              {submitting ? 'Validating...' : 'Submit Registration'}
             </button>
           </form>
         </div>

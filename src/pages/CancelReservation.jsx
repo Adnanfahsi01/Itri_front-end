@@ -13,7 +13,7 @@ function CancelReservation() {
             handleCancellation();
         } else {
             setStatus('error');
-            setMessage('Jeton d\'annulation manquant.');
+            setMessage('Missing cancellation token.');
         }
     }, [token]);
 
@@ -24,7 +24,7 @@ function CancelReservation() {
             setMessage(response.data.message);
         } catch (error) {
             setStatus('error');
-            setMessage(error.response?.data?.message || 'Une erreur est survenue lors de l\'annulation.');
+            setMessage(error.response?.data?.message || 'An error occurred during cancellation.');
         }
     };
 
@@ -34,7 +34,7 @@ function CancelReservation() {
                 {status === 'processing' && (
                     <div className="flex flex-col items-center">
                         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mb-4"></div>
-                        <h2 className="text-2xl font-bold text-white tracking-tight">Annulation en cours...</h2>
+                        <h2 className="text-2xl font-bold text-white tracking-tight">Cancellation in progress...</h2>
                     </div>
                 )}
 
@@ -45,13 +45,13 @@ function CancelReservation() {
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
                             </svg>
                         </div>
-                        <h2 className="text-2xl font-bold text-white mb-4">Annulé</h2>
+                        <h2 className="text-2xl font-bold text-white mb-4">Cancelled</h2>
                         <p className="text-slate-400 mb-8">{message}</p>
                         <Link
                             to="/"
                             className="inline-block bg-primary text-white px-8 py-3 rounded-full font-bold hover:bg-accent transition-colors"
                         >
-                            Retour à l'accueil
+                            Back to home
                         </Link>
                     </div>
                 )}
@@ -63,13 +63,13 @@ function CancelReservation() {
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                             </svg>
                         </div>
-                        <h2 className="text-2xl font-bold text-white mb-4">Erreur</h2>
+                        <h2 className="text-2xl font-bold text-white mb-4">Error</h2>
                         <p className="text-red-400 mb-8">{message}</p>
                         <Link
                             to="/"
                             className="inline-block bg-primary text-white px-8 py-3 rounded-full font-bold hover:bg-accent transition-colors"
                         >
-                            Retour à l'accueil
+                            Back to home
                         </Link>
                     </div>
                 )}

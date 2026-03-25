@@ -32,7 +32,7 @@ function HackathonMemberConfirmation() {
           etablissement: data?.etablissement || '',
         });
       } catch (err) {
-        setError(err.response?.data?.message || "Lien d'invitation invalide ou expire.");
+        setError(err.response?.data?.message || 'Invalid or expired invitation link.');
       } finally {
         setLoading(false);
       }
@@ -64,14 +64,14 @@ function HackathonMemberConfirmation() {
       };
 
       const response = await confirmHackathonMemberInvitation(token, payload);
-      setSuccess(response.data?.message || 'Confirmation enregistree avec succes.');
+      setSuccess(response.data?.message || 'Confirmation recorded successfully.');
       setInvitation((prev) => ({ ...prev, status: 'confirmed' }));
     } catch (err) {
       if (err.response?.data?.errors) {
         const messages = Object.values(err.response.data.errors).flat().join('\n');
         setError(messages);
       } else {
-        setError(err.response?.data?.message || 'Erreur lors de la confirmation.');
+        setError(err.response?.data?.message || 'Error while confirming your information.');
       }
     } finally {
       setSubmitting(false);
@@ -81,7 +81,7 @@ function HackathonMemberConfirmation() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center py-20">
-        <p className="text-white text-lg">Chargement de votre invitation...</p>
+        <p className="text-white text-lg">Loading your invitation...</p>
       </div>
     );
   }
@@ -89,9 +89,9 @@ function HackathonMemberConfirmation() {
   return (
     <div className="min-h-screen py-16 pt-32">
       <div className="container mx-auto px-6 mb-12 text-center">
-        <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">Confirmation Membre Hackathon</h1>
+        <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">Hackathon Member Confirmation</h1>
         <p className="text-lg text-slate-400 max-w-3xl mx-auto">
-          Completez vos informations pour finaliser votre participation a l'equipe.
+          Complete your details to finalize your team participation.
         </p>
       </div>
 
@@ -107,7 +107,7 @@ function HackathonMemberConfirmation() {
         <div className="container mx-auto px-6 mb-8">
           <div className="bg-green-900/40 border border-green-500/50 text-green-100 px-6 py-6 rounded-lg text-center backdrop-blur-sm">
             <p>{success}</p>
-            <p className="text-sm opacity-90 mt-2">Le chef d'equipe a ete notifie.</p>
+            <p className="text-sm opacity-90 mt-2">The team leader has been notified.</p>
           </div>
         </div>
       )}
@@ -117,7 +117,7 @@ function HackathonMemberConfirmation() {
           <div className="max-w-2xl mx-auto bg-slate-800 border border-slate-700 p-8 md:p-10 rounded-2xl shadow-xl">
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
-                <label className="block text-sm font-semibold mb-2 text-slate-300">Equipe</label>
+                <label className="block text-sm font-semibold mb-2 text-slate-300">Team</label>
                 <input
                   type="text"
                   value={invitation.team_name || ''}
@@ -127,7 +127,7 @@ function HackathonMemberConfirmation() {
               </div>
 
               <div>
-                <label className="block text-sm font-semibold mb-2 text-slate-300">Nom complet *</label>
+                <label className="block text-sm font-semibold mb-2 text-slate-300">Full Name *</label>
                 <input
                   type="text"
                   name="full_name"
@@ -153,7 +153,7 @@ function HackathonMemberConfirmation() {
               </div>
 
               <div>
-                <label className="block text-sm font-semibold mb-2 text-slate-300">Fonctionnalite (optionnel)</label>
+                <label className="block text-sm font-semibold mb-2 text-slate-300">Role (optional)</label>
                 <select
                   name="fonctionnalite"
                   value={formData.fonctionnalite}
@@ -161,15 +161,15 @@ function HackathonMemberConfirmation() {
                   disabled={invitation.status === 'confirmed'}
                   className="w-full px-4 py-2 bg-slate-700 text-white border border-slate-600 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent disabled:bg-slate-900 disabled:text-slate-300"
                 >
-                  <option value="">Non precise</option>
-                  <option value="etudiant">Etudiant</option>
-                  <option value="employer">Employe</option>
+                  <option value="">Not specified</option>
+                  <option value="etudiant">Student</option>
+                  <option value="employer">Employee</option>
                 </select>
               </div>
 
               {formData.fonctionnalite === 'etudiant' && (
                 <div>
-                  <label className="block text-sm font-semibold mb-2 text-slate-300">Etablissement (optionnel)</label>
+                  <label className="block text-sm font-semibold mb-2 text-slate-300">Institution (optional)</label>
                   <input
                     type="text"
                     name="etablissement"
@@ -187,10 +187,10 @@ function HackathonMemberConfirmation() {
                 className="w-full bg-primary text-white py-3 rounded-lg font-bold text-lg hover:bg-opacity-90 disabled:bg-slate-600 disabled:text-slate-400 disabled:cursor-not-allowed"
               >
                 {invitation.status === 'confirmed'
-                  ? 'Informations deja confirmees'
+                  ? 'Information already confirmed'
                   : submitting
-                    ? 'Validation en cours...'
-                    : 'Confirmer mes informations'}
+                    ? 'Validating...'
+                    : 'Confirm my information'}
               </button>
             </form>
           </div>
