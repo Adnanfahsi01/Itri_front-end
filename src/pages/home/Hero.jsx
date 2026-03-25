@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import TextType from './TextType';
+import ShinyText from './ShinyText';
 import './Home.css';
 import './HeroAnimation.css';
 
@@ -71,7 +72,19 @@ export default function Hero() {
             Location
           </button>
         </div>
-        <p className="hero-event-dates">1, 2 and 3 april 2026</p>
+        <ShinyText
+          text="1, 2 and 3 April 2026"
+          speed={3.8}
+          delay={0.2}
+          color="#d2d8e4"
+          shineColor="#0F172A"
+          spread={120}
+          direction="left"
+          yoyo={false}
+          pauseOnHover={false}
+          disabled={false}
+          className="hero-event-dates"
+        />
 
         <div className="hero-socials" aria-label="Social media links">
           <a
