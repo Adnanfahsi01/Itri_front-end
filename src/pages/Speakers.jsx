@@ -40,7 +40,7 @@ function Speakers() {
   return (
     <div className="min-h-screen py-16 pt-32">
       {/* Header */}
-      <div className="container mx-auto px-6 mb-32 text-center">
+      <div className="container mx-auto px-6 mb-48 pb-4 text-center">
         <h1 className="text-5xl font-bold text-center text-white mb-10">
           Our Speakers
         </h1>
@@ -51,7 +51,7 @@ function Speakers() {
       </div>
 
       {/* Speakers Grid */}
-      <div className="container mx-auto px-6 mt-28">
+      <div className="container mx-auto px-6 mt-36">
         {speakers.length === 0 ? (
           <div className="text-center py-16">
             <p className="text-xl text-muted">

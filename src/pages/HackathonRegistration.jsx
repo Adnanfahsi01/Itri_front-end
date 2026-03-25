@@ -285,7 +285,7 @@ function HackathonRegistration() {
 
   return (
     <div className="min-h-screen py-16 pt-32">
-      <div className="container mx-auto px-6 mb-12 text-center">
+      <div className="container mx-auto px-6 mb-32 pb-4 text-center">
         <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
           Hackathon Registration
         </h1>
@@ -336,7 +336,7 @@ function HackathonRegistration() {
         </div>
       )}
 
-      <div className="container mx-auto px-6 mb-20">
+      <div className="container mx-auto px-6 mt-12 mb-20">
         <div className="max-w-2xl mx-auto bg-slate-800 border border-slate-700 p-8 md:p-10 rounded-2xl shadow-xl">
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid md:grid-cols-2 gap-4">

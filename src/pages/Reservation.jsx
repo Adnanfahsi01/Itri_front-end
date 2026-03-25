@@ -291,7 +291,7 @@ function Reservation() {
   return (
     <div className="min-h-screen py-16 pt-32">
       {/* Header */}
-      <div className="container mx-auto px-6 mb-24 text-center">
+      <div className="container mx-auto px-6 mb-44 pb-8 text-center">
         <h1 className="text-4xl md:text-5xl font-bold text-white mb-7">
           Reserve Your Spot
         </h1>
@@ -346,7 +346,7 @@ function Reservation() {
         </div>
       )}
 
-      <div className="container mx-auto px-6 mt-12 mb-20">
+      <div className="container mx-auto px-6 mt-24 mb-20">
         <div className="max-w-2xl mx-auto bg-slate-800 border border-slate-700 p-8 md:p-10 rounded-2xl shadow-xl">
           {/* Day Selector */}
           <div className="mb-8 border-b border-slate-700 pb-8">
