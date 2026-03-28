@@ -29,8 +29,20 @@ function AdminQRScanner() {
   const machinePulseTimeoutRef = useRef(null);
   const scanTimeoutRef = useRef(null);
 
+  const normalizeScanPayload = (value) => {
+    return String(value ?? '')
+      .replace(/[\u0000-\u001F\u007F-\u009F]/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+  };
+
+  const normalizeTicketCode = (value, { uppercase = true } = {}) => {
+    const normalized = normalizeScanPayload(value).replace(/\s+/g, '');
+    return uppercase ? normalized.toUpperCase() : normalized;
+  };
+
   const flushHardwareBuffer = (force = false) => {
-    const rawValue = hardwareBufferRef.current.trim();
+    const rawValue = normalizeScanPayload(hardwareBufferRef.current);
     hardwareBufferRef.current = '';
     setScannerBuffer('');
 
@@ -129,25 +141,29 @@ function AdminQRScanner() {
   }, [isProcessing, loading]);
 
   const extractTicketCode = (rawText) => {
-    if (!rawText) return "";
+    const cleanedPayload = normalizeScanPayload(rawText);
+    if (!cleanedPayload) return '';
+
     try {
-      const parsed = JSON.parse(rawText);
-      if (parsed && typeof parsed === 'object' && parsed.ticket_code) return parsed.ticket_code;
+      const parsed = JSON.parse(cleanedPayload);
+      if (parsed && typeof parsed === 'object' && parsed.ticket_code) {
+        return parsed.ticket_code;
+      }
     } catch { }
 
     // Fuzzy regex extraction for AZERTY/Caps Lock corrupted hardware scans 
     // Example: "TICKET?CODE">"2UEBAMF2"
     // Find "TICKET", then any non-alphanumeric chars, then "CODE", then any non-alphanumeric, then 8 alphanumeric chars.
-    let match = rawText.match(/TICKET[^a-zA-Z0-9]*CODE[^a-zA-Z0-9]*([A-Z0-9]{8})/i);
+    let match = cleanedPayload.match(/TICKET[^a-zA-Z0-9]*CODE[^a-zA-Z0-9]*([A-Z0-9]{8})/i);
     if (match) return match[1];
 
     // Fallback: finding the first 8-character alphanumeric string (like 2UEBAMF2)
-    const matches = rawText.match(/([A-Z0-9]{8})/g);
+    const matches = cleanedPayload.match(/([A-Z0-9]{8})/g);
     if (matches && matches.length > 0) {
         return matches[0];
     }
-    
-    return rawText.trim();
+
+    return cleanedPayload;
   };
 
   const getValidationStatusKey = (result) => {
@@ -198,22 +214,28 @@ function AdminQRScanner() {
   };
 
   const processMachineScan = (scannedText) => {
-    const cleanInput = String(scannedText || '').trim();
-    if (!cleanInput || isProcessing || loading) return;
+    const rawScannedValue = String(scannedText ?? '');
+    const cleanedScannedValue = normalizeScanPayload(rawScannedValue);
+    if (!cleanedScannedValue || isProcessing || loading) return;
 
-    const ticketCode = extractTicketCode(cleanInput);
-    if (!ticketCode) return;
+    const extractedTicketCode = extractTicketCode(cleanedScannedValue);
+    const normalizedTicketCode = normalizeTicketCode(extractedTicketCode);
+    if (!normalizedTicketCode) return;
+
+    // TEMP DEBUG: remove once scanner payload format is verified in production.
+    console.log('[Scanner Debug] raw scanned value:', JSON.stringify(rawScannedValue));
+    console.log('[Scanner Debug] cleaned scanned value:', cleanedScannedValue);
+    console.log('[Scanner Debug] final ticket code sent to API:', normalizedTicketCode);
 
     setLastScanSource('machine');
     setIsProcessing(true);
     setManualCode('');
     triggerMachineFeedback();
 
-    const normalizedTicketCode = String(ticketCode).trim().toUpperCase();
-    validateQRCode(JSON.stringify({ ticket_code: normalizedTicketCode }), {
+    validateQRCode(normalizedTicketCode, {
       source: 'machine',
       ticketCode: normalizedTicketCode,
-      scannedPayload: cleanInput,
+      scannedPayload: cleanedScannedValue,
     });
 
     if (manualInputRef.current) {
@@ -226,7 +248,7 @@ function AdminQRScanner() {
       clearTimeout(manualFlushTimeoutRef.current);
     }
 
-    const value = String(nextValue || '').trim();
+    const value = normalizeScanPayload(nextValue);
     if (value.length < 6) {
       return;
     }
@@ -272,9 +294,9 @@ function AdminQRScanner() {
 
     setScanResult(decodedText);
 
-    const ticketCode = extractTicketCode(decodedText);
+    const ticketCode = normalizeTicketCode(extractTicketCode(decodedText));
     setLastScanSource('camera');
-    validateQRCode(JSON.stringify({ ticket_code: ticketCode }), {
+    validateQRCode(ticketCode, {
       source: 'camera',
       ticketCode,
       scannedPayload: decodedText,
@@ -294,8 +316,13 @@ function AdminQRScanner() {
     }
   };
 
-  const validateQRCode = async (qrData, options = {}) => {
+  const validateQRCode = async (ticketCodeInput, options = {}) => {
     const { source = 'camera', ticketCode = null, scannedPayload = '' } = options;
+    const normalizedTicketCode = normalizeTicketCode(ticketCodeInput);
+
+    if (!normalizedTicketCode) {
+      return;
+    }
 
     // Prevent multiple simultaneous validations
     if (loading) {
@@ -309,10 +336,18 @@ function AdminQRScanner() {
 
     try {
       const token = localStorage.getItem('adminToken');
-      const isHackathon = qrData.includes('HCK-') || qrData.includes('HACK-');
+      const qrData = JSON.stringify({ ticket_code: normalizedTicketCode });
+      const isHackathon = normalizedTicketCode.startsWith('HCK-') || normalizedTicketCode.startsWith('HACK-');
       const endpoint = isHackathon 
         ? `${API_BASE_URL}/admin/hackathons/validate-qr`
         : `${API_BASE_URL}/reservations/validate-qr`;
+
+      // TEMP DEBUG: remove after scanner/manual parity verification.
+      console.log('[Scanner Debug] validation payload:', {
+        source,
+        qr_data: qrData,
+        mark_as_used: false,
+      });
 
       const response = await fetch(endpoint, {
         method: 'POST',
@@ -333,7 +368,7 @@ function AdminQRScanner() {
       } else {
         const statusKey = getValidationStatusKey(data);
         setMachineQuickResult({
-          ticketCode: ticketCode || extractTicketCode(scannedPayload) || '',
+          ticketCode: ticketCode || normalizedTicketCode || '',
           scannedPayload,
           scannedAt: new Date().toISOString(),
           statusKey,
@@ -351,7 +386,7 @@ function AdminQRScanner() {
         setValidationResult(fallbackResult);
       } else {
         setMachineQuickResult({
-          ticketCode: ticketCode || extractTicketCode(scannedPayload) || '',
+          ticketCode: ticketCode || normalizedTicketCode || '',
           scannedPayload,
           scannedAt: new Date().toISOString(),
           statusKey: 'server_error',
@@ -362,6 +397,10 @@ function AdminQRScanner() {
       setLoading(false);
       if (source === 'machine') {
         setIsProcessing(false);
+        setManualCode('');
+        if (manualInputRef.current) {
+          manualInputRef.current.focus();
+        }
       }
     }
   };
@@ -433,16 +472,18 @@ function AdminQRScanner() {
 
   const handleManualValidation = (e) => {
     e.preventDefault();
-    if (manualCode.trim()) {
-      processMachineScan(manualCode.trim());
+    const value = normalizeScanPayload(manualCode);
+    if (value) {
+      processMachineScan(value);
     }
   };
 
   const handleManualInputKeyDown = (e) => {
     if (e.key === 'Enter' || e.key === 'Tab') {
       e.preventDefault();
-      if (manualCode.trim()) {
-        processMachineScan(manualCode.trim());
+      const value = normalizeScanPayload(manualCode);
+      if (value) {
+        processMachineScan(value);
       }
     }
   };
@@ -652,7 +693,7 @@ function AdminQRScanner() {
                     type="text"
                     value={manualCode}
                     onChange={(e) => {
-                      const nextValue = e.target.value.toUpperCase();
+                      const nextValue = normalizeScanPayload(e.target.value).toUpperCase();
                       setManualCode(nextValue);
                       queueManualScan(nextValue);
                     }}
