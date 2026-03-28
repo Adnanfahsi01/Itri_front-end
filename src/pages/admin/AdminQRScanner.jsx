@@ -11,6 +11,9 @@ function AdminQRScanner() {
   const navigate = useNavigate();
   const [scanResult, setScanResult] = useState(null);
   const [validationResult, setValidationResult] = useState(null);
+  const [lastScanSource, setLastScanSource] = useState(null);
+  const [machineQuickResult, setMachineQuickResult] = useState(null);
+  const [machinePulse, setMachinePulse] = useState(false);
   const [loading, setLoading] = useState(false);
   const [manualCode, setManualCode] = useState('');
   const [scanning, setScanning] = useState(true);
@@ -22,6 +25,8 @@ function AdminQRScanner() {
   const manualInputRef = useRef(null);
   const hardwareBufferRef = useRef('');
   const hardwareFlushTimeoutRef = useRef(null);
+  const manualFlushTimeoutRef = useRef(null);
+  const machinePulseTimeoutRef = useRef(null);
   const scanTimeoutRef = useRef(null);
 
   const flushHardwareBuffer = (force = false) => {
@@ -59,6 +64,12 @@ function AdminQRScanner() {
       }
       if (hardwareFlushTimeoutRef.current) {
         clearTimeout(hardwareFlushTimeoutRef.current);
+      }
+      if (manualFlushTimeoutRef.current) {
+        clearTimeout(manualFlushTimeoutRef.current);
+      }
+      if (machinePulseTimeoutRef.current) {
+        clearTimeout(machinePulseTimeoutRef.current);
       }
     };
   }, [navigate]);
@@ -139,18 +150,94 @@ function AdminQRScanner() {
     return rawText.trim();
   };
 
-  const handleHardwareScan = (scannedText) => {
-    if (isProcessing) return;
+  const getValidationStatusKey = (result) => {
+    const message = String(result?.message || '').toLowerCase();
 
+    if (message.includes('error: http') || message.includes('server') || message.includes('network')) {
+      return 'server_error';
+    }
+
+    if (result?.is_used || message.includes('already') || message.includes('deja') || message.includes('déjà')) {
+      return 'already_used';
+    }
+
+    if (message.includes('not found') || message.includes('introuvable') || message.includes('non trouve')) {
+      return 'not_found';
+    }
+
+    if (result?.valid) {
+      return 'valid';
+    }
+
+    if (message.includes('invalid') || message.includes('invalide')) {
+      return 'invalid';
+    }
+
+    return 'invalid';
+  };
+
+  const getStatusDisplay = (statusKey) => {
+    const map = {
+      valid: { label: 'VALID', tone: 'text-emerald-300', badge: 'bg-emerald-400/15 border-emerald-400/30 text-emerald-200' },
+      already_used: { label: 'ALREADY USED', tone: 'text-amber-300', badge: 'bg-amber-400/15 border-amber-400/30 text-amber-200' },
+      invalid: { label: 'INVALID', tone: 'text-red-300', badge: 'bg-red-400/15 border-red-400/30 text-red-200' },
+      not_found: { label: 'NOT FOUND', tone: 'text-orange-300', badge: 'bg-orange-400/15 border-orange-400/30 text-orange-200' },
+      server_error: { label: 'SERVER ERROR', tone: 'text-violet-300', badge: 'bg-violet-400/15 border-violet-400/30 text-violet-200' },
+    };
+    return map[statusKey] || map.invalid;
+  };
+
+  const triggerMachineFeedback = () => {
+    setMachinePulse(true);
+    if (machinePulseTimeoutRef.current) {
+      clearTimeout(machinePulseTimeoutRef.current);
+    }
+    machinePulseTimeoutRef.current = setTimeout(() => {
+      setMachinePulse(false);
+    }, 380);
+  };
+
+  const processMachineScan = (scannedText) => {
+    const cleanInput = String(scannedText || '').trim();
+    if (!cleanInput || isProcessing || loading) return;
+
+    const ticketCode = extractTicketCode(cleanInput);
+    if (!ticketCode) return;
+
+    setLastScanSource('machine');
     setIsProcessing(true);
-    setScanning(false);
-    setScanResult(scannedText);
+    setManualCode('');
+    triggerMachineFeedback();
 
-    const ticketCode = extractTicketCode(scannedText);
-    validateQRCode(JSON.stringify({ ticket_code: ticketCode }));
+    const normalizedTicketCode = String(ticketCode).trim().toUpperCase();
+    validateQRCode(JSON.stringify({ ticket_code: normalizedTicketCode }), {
+      source: 'machine',
+      ticketCode: normalizedTicketCode,
+      scannedPayload: cleanInput,
+    });
 
-    if (scanTimeoutRef.current) clearTimeout(scanTimeoutRef.current);
-    scanTimeoutRef.current = setTimeout(() => setIsProcessing(false), 3000);
+    if (manualInputRef.current) {
+      manualInputRef.current.focus();
+    }
+  };
+
+  const queueManualScan = (nextValue) => {
+    if (manualFlushTimeoutRef.current) {
+      clearTimeout(manualFlushTimeoutRef.current);
+    }
+
+    const value = String(nextValue || '').trim();
+    if (value.length < 6) {
+      return;
+    }
+
+    manualFlushTimeoutRef.current = setTimeout(() => {
+      processMachineScan(value);
+    }, 90);
+  };
+
+  const handleHardwareScan = (scannedText) => {
+    processMachineScan(scannedText);
   };
 
   const getDecodedValue = (scanPayload) => {
@@ -186,7 +273,12 @@ function AdminQRScanner() {
     setScanResult(decodedText);
 
     const ticketCode = extractTicketCode(decodedText);
-    validateQRCode(JSON.stringify({ ticket_code: ticketCode }));
+    setLastScanSource('camera');
+    validateQRCode(JSON.stringify({ ticket_code: ticketCode }), {
+      source: 'camera',
+      ticketCode,
+      scannedPayload: decodedText,
+    });
 
     // Reset processing after 3 seconds to allow for new scans
     scanTimeoutRef.current = setTimeout(() => {
@@ -202,14 +294,18 @@ function AdminQRScanner() {
     }
   };
 
-  const validateQRCode = async (qrData) => {
+  const validateQRCode = async (qrData, options = {}) => {
+    const { source = 'camera', ticketCode = null, scannedPayload = '' } = options;
+
     // Prevent multiple simultaneous validations
     if (loading) {
       return;
     }
 
     setLoading(true);
-    setValidationResult(null);
+    if (source === 'camera') {
+      setValidationResult(null);
+    }
 
     try {
       const token = localStorage.getItem('adminToken');
@@ -232,19 +328,45 @@ function AdminQRScanner() {
       }
 
       const data = await response.json();
-      setValidationResult(data);
+      if (source === 'camera') {
+        setValidationResult(data);
+      } else {
+        const statusKey = getValidationStatusKey(data);
+        setMachineQuickResult({
+          ticketCode: ticketCode || extractTicketCode(scannedPayload) || '',
+          scannedPayload,
+          scannedAt: new Date().toISOString(),
+          statusKey,
+          data,
+        });
+      }
     } catch (error) {
       console.error('Error validating QR code:', error);
-      setValidationResult({
+      const fallbackResult = {
         valid: false,
         message: `Error: ${error.message}`,
-      });
+      };
+
+      if (source === 'camera') {
+        setValidationResult(fallbackResult);
+      } else {
+        setMachineQuickResult({
+          ticketCode: ticketCode || extractTicketCode(scannedPayload) || '',
+          scannedPayload,
+          scannedAt: new Date().toISOString(),
+          statusKey: 'server_error',
+          data: fallbackResult,
+        });
+      }
     } finally {
       setLoading(false);
+      if (source === 'machine') {
+        setIsProcessing(false);
+      }
     }
   };
 
-  const markTicketAsUsed = async (ticketCode) => {
+  const markTicketAsUsed = async (ticketCode, source = 'camera') => {
     // Prevent multiple simultaneous requests
     if (loading) {
       return;
@@ -274,13 +396,36 @@ function AdminQRScanner() {
       }
 
       const data = await response.json();
-      setValidationResult(data);
+      if (source === 'camera') {
+        setValidationResult(data);
+      } else {
+        const statusKey = getValidationStatusKey(data);
+        setMachineQuickResult((prev) => ({
+          ticketCode,
+          scannedPayload: prev?.scannedPayload || ticketCode,
+          scannedAt: new Date().toISOString(),
+          statusKey,
+          data,
+        }));
+      }
     } catch (error) {
       console.error('Error marking ticket as used:', error);
-      setValidationResult({
+      const fallbackResult = {
         valid: false,
         message: `Error: ${error.message}`,
-      });
+      };
+
+      if (source === 'camera') {
+        setValidationResult(fallbackResult);
+      } else {
+        setMachineQuickResult((prev) => ({
+          ticketCode,
+          scannedPayload: prev?.scannedPayload || ticketCode,
+          scannedAt: new Date().toISOString(),
+          statusKey: 'server_error',
+          data: fallbackResult,
+        }));
+      }
     } finally {
       setLoading(false);
     }
@@ -289,40 +434,16 @@ function AdminQRScanner() {
   const handleManualValidation = (e) => {
     e.preventDefault();
     if (manualCode.trim()) {
-      const cleanCode = extractTicketCode(manualCode.trim().toUpperCase());
-      
-      // First, find the reservation by ticket code to get the email
-      fetch(`${API_BASE_URL}/reservations`, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('adminToken')}`,
-        },
-      })
-        .then(response => response.json())
-        .then(reservations => {
-          const reservation = reservations.find(r => r.ticket_code === cleanCode);
-          if (reservation) {
-            // Create QR data with both ticket_code and email (like real QR codes)
-            const qrData = JSON.stringify({
-              ticket_code: cleanCode,
-              email: reservation.email
-            });
-            setScanResult(qrData);
-            validateQRCode(qrData);
-          } else {
-            // If ticket not found, still validate with just ticket code
-            const qrData = JSON.stringify({ ticket_code: cleanCode });
-            setScanResult(qrData);
-            validateQRCode(qrData);
-          }
-        })
-        .catch(() => {
-          // If API call fails, validate with just ticket code
-          const qrData = JSON.stringify({ ticket_code: cleanCode });
-          setScanResult(qrData);
-          validateQRCode(qrData);
-        });
-        
-        setManualCode(''); // Clear input after scan
+      processMachineScan(manualCode.trim());
+    }
+  };
+
+  const handleManualInputKeyDown = (e) => {
+    if (e.key === 'Enter' || e.key === 'Tab') {
+      e.preventDefault();
+      if (manualCode.trim()) {
+        processMachineScan(manualCode.trim());
+      }
     }
   };
 
@@ -334,9 +455,12 @@ function AdminQRScanner() {
 
     setScanResult(null);
     setValidationResult(null);
+    setLastScanSource(null);
     setError(null);
     setIsProcessing(false);
     setLastScannedCode(null);
+    setMachineQuickResult(null);
+    setMachinePulse(false);
     hardwareBufferRef.current = '';
     setScannerBuffer('');
     setScanning(true);
@@ -350,6 +474,8 @@ function AdminQRScanner() {
     setSelectedCamera(cameraId);
     setError(null);
   };
+
+  const machineStatusDisplay = getStatusDisplay(machineQuickResult?.statusKey || 'invalid');
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] admin-reduced-motion">
@@ -384,10 +510,10 @@ function AdminQRScanner() {
       </header>
 
       <div className="container mx-auto px-6 py-10">
-        <div className="grid lg:grid-cols-1 gap-10 items-start">
+        <div className="grid lg:grid-cols-[minmax(0,1fr)_360px] gap-8 items-start">
 
           {/* QR Scanner Section */}
-          <div className="bg-white/90 backdrop-blur-sm p-10 rounded-[2.5rem] border border-gray-100 shadow-2xl shadow-gray-200/40 relative overflow-hidden group max-w-4xl w-full mx-auto">
+          <div className="bg-white/90 backdrop-blur-sm p-10 rounded-[2.5rem] border border-gray-100 shadow-2xl shadow-gray-200/40 relative overflow-hidden group w-full">
             <div className="absolute top-0 right-0 w-64 h-64 bg-secondary/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
 
             <h2 className="text-2xl font-black text-gray-800 tracking-tight mb-8 flex items-center gap-4 relative z-10">
@@ -525,7 +651,12 @@ function AdminQRScanner() {
                     ref={manualInputRef}
                     type="text"
                     value={manualCode}
-                    onChange={(e) => setManualCode(e.target.value.toUpperCase())}
+                    onChange={(e) => {
+                      const nextValue = e.target.value.toUpperCase();
+                      setManualCode(nextValue);
+                      queueManualScan(nextValue);
+                    }}
+                    onKeyDown={handleManualInputKeyDown}
                     placeholder="ex: ABC-123-X"
                     className="w-full px-8 py-5 bg-gray-50/50 border border-gray-100 rounded-[1.5rem] font-black tracking-widest text-gray-800 placeholder:font-bold placeholder:text-gray-300 placeholder:tracking-normal focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all outline-none shadow-inner group-hover:bg-white"
                   />
@@ -543,10 +674,88 @@ function AdminQRScanner() {
             </div>
           </div>
 
+          <aside className="bg-[#09111f]/95 border border-cyan-900/40 rounded-[2.25rem] shadow-2xl shadow-cyan-950/30 overflow-hidden relative lg:sticky lg:top-28">
+            <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-cyan-500/10 to-transparent pointer-events-none"></div>
+            <div className="p-6 border-b border-cyan-800/40">
+              <p className="text-[10px] font-black tracking-[0.24em] uppercase text-cyan-200/70">Machine Scanner Feed</p>
+              <h3 className="text-lg font-black text-cyan-50 tracking-tight mt-1">Quick Result Panel</h3>
+              <p className="text-[11px] text-slate-300 mt-1">Instant validation for USB/physical barcode scanner input.</p>
+            </div>
+
+            <div className={`p-6 transition-all duration-300 ${machinePulse ? 'bg-cyan-500/8' : ''}`}>
+              {!machineQuickResult ? (
+                <div className="rounded-2xl border border-cyan-900/40 bg-[#070d1a] p-5 text-slate-300">
+                  <p className="text-xs font-bold uppercase tracking-[0.18em] text-slate-400 mb-3">Awaiting Scan</p>
+                  <p className="text-sm leading-relaxed">Use the focused scanner input. Each scan is auto-validated and displayed here without popup interruption.</p>
+                  {scannerBuffer && (
+                    <p className="mt-4 text-[11px] font-bold text-cyan-300/80 uppercase tracking-[0.16em] break-all">Buffer: {scannerBuffer}</p>
+                  )}
+                </div>
+              ) : (
+                <div className="rounded-2xl border border-cyan-800/50 bg-[#060b16] p-5 shadow-[0_0_35px_rgba(14,165,233,0.08)]">
+                  <div className="flex items-start justify-between gap-3 mb-4">
+                    <div>
+                      <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Ticket Code</p>
+                      <p className="text-xl font-black text-cyan-100 tracking-[0.08em] break-all">{machineQuickResult.ticketCode || 'N/A'}</p>
+                    </div>
+                    <span className={`text-[10px] font-black uppercase tracking-[0.14em] px-3 py-1.5 rounded-full border ${machineStatusDisplay.badge}`}>
+                      {machineStatusDisplay.label}
+                    </span>
+                  </div>
+
+                  <div className="space-y-3">
+                    <div className="rounded-xl border border-slate-700/70 bg-slate-950/50 px-4 py-3">
+                      <p className="text-[10px] uppercase tracking-[0.18em] text-slate-400 mb-1">Validation Result</p>
+                      <p className={`text-sm font-bold ${machineStatusDisplay.tone}`}>{machineQuickResult.data?.message || 'No message'}</p>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3 text-[11px]">
+                      <div className="rounded-xl border border-slate-700/60 bg-slate-900/50 px-3 py-2.5">
+                        <p className="uppercase tracking-[0.14em] text-slate-500 mb-1">Status</p>
+                        <p className={`font-black ${machineStatusDisplay.tone}`}>{machineStatusDisplay.label}</p>
+                      </div>
+                      <div className="rounded-xl border border-slate-700/60 bg-slate-900/50 px-3 py-2.5">
+                        <p className="uppercase tracking-[0.14em] text-slate-500 mb-1">Scan Time</p>
+                        <p className="font-black text-cyan-100">{new Date(machineQuickResult.scannedAt).toLocaleTimeString()}</p>
+                      </div>
+                    </div>
+
+                    {machineQuickResult.data?.reservation && (
+                      <div className="rounded-xl border border-cyan-900/50 bg-cyan-950/20 px-4 py-3">
+                        <p className="text-[10px] uppercase tracking-[0.2em] text-cyan-200/70 mb-2">Attendee</p>
+                        <p className="text-sm font-black text-cyan-50">
+                          {machineQuickResult.data.reservation.first_name} {machineQuickResult.data.reservation.last_name}
+                        </p>
+                        <p className="text-xs text-cyan-100/75 break-all mt-1">{machineQuickResult.data.reservation.email}</p>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="flex gap-3 mt-5">
+                    {machineQuickResult.data?.valid && !machineQuickResult.data?.is_used && machineQuickResult.data?.reservation && (
+                      <button
+                        onClick={() => markTicketAsUsed(machineQuickResult.data.reservation.ticket_code, 'machine')}
+                        className="flex-1 h-11 rounded-xl bg-emerald-600 text-white text-[11px] font-black uppercase tracking-[0.14em] hover:bg-emerald-500 transition-colors"
+                      >
+                        Authorize Entry
+                      </button>
+                    )}
+                    <button
+                      onClick={() => setMachineQuickResult(null)}
+                      className="h-11 px-4 rounded-xl bg-slate-800 text-slate-100 text-[11px] font-black uppercase tracking-[0.14em] border border-slate-700 hover:bg-slate-700 transition-colors"
+                    >
+                      Clear
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </aside>
+
         </div>
 
         {/* Mobile-first Validation Popup */}
-        {validationResult && !loading && (
+        {validationResult && !loading && lastScanSource === 'camera' && (
           <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm p-4 sm:p-6 flex items-end sm:items-center justify-center">
             <div className={`w-full max-w-xl rounded-[1.75rem] border p-6 sm:p-8 shadow-2xl ${validationResult.valid ? 'bg-emerald-50 border-emerald-200' : 'bg-red-50 border-red-200'}`}>
               <div className="flex items-start justify-between gap-4 mb-5">

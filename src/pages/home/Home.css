@@ -508,17 +508,65 @@
 
 .sponsors-loop-wrapper {
   position: relative;
-  padding: 0 0 8px;
-  overflow: visible;
+  padding: 64px 22px 60px;
+  overflow: hidden;
+  border-radius: 0;
+  border: none;
+  background:
+    radial-gradient(circle at 50% 52%, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0.15) 18%, rgba(255, 255, 255, 0.09) 36%, rgba(255, 255, 255, 0) 70%),
+    linear-gradient(-45deg, #ffffff 0%, #f3f8ff 10%, #e7f1ff 22%, #24408a 34%, #005ec2 45%, #2f7fdd 53%, #c5dcff 58%, #f8fcff 62%, #d4e7ff 67%, #4d86d3 73%, #1f3f83 82%, #1a2946 92%, #0f172a 100%);
+  background-size: auto, 400% 400%;
+  animation: sponsorsGradientShift 24s cubic-bezier(0.42, 0, 0.2, 1) infinite;
+  box-shadow: none;
+}
+
+.sponsors-loop-wrapper::before {
+  content: '';
+  position: absolute;
+  width: 460px;
+  height: 460px;
+  top: -30%;
+  right: -8%;
+  left: auto;
+  transform: none;
+  border-radius: 999px;
+  background: radial-gradient(circle, rgba(147, 197, 253, 0.14) 0%, rgba(59, 130, 246, 0.06) 42%, rgba(59, 130, 246, 0) 74%);
+  filter: blur(4px);
+  animation: sponsorsGlowFloat 11s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.sponsors-loop-wrapper::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(circle at 8% 22%, rgba(255, 255, 255, 0.68) 1.6px, transparent 1.9px),
+    radial-gradient(circle at 25% 75%, rgba(147, 197, 253, 0.48) 1.5px, transparent 1.8px),
+    radial-gradient(circle at 54% 12%, rgba(255, 255, 255, 0.62) 1.5px, transparent 1.8px),
+    radial-gradient(circle at 78% 66%, rgba(96, 165, 250, 0.45) 1.7px, transparent 2px),
+    radial-gradient(circle at 96% 28%, rgba(255, 255, 255, 0.55) 1.2px, transparent 1.5px),
+    radial-gradient(circle at 42% 88%, rgba(191, 219, 254, 0.46) 1.4px, transparent 1.7px);
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  opacity: 0.42;
+  animation: sponsorsParticlesDrift 28s linear infinite, sponsorsStarsTwinkle 7.2s ease-in-out infinite alternate;
+  pointer-events: none;
 }
 
 .sponsors-title-compact {
-  margin-bottom: 18px;
+  margin-bottom: 22px;
+  color: #eaf2ff;
+  text-shadow: 0 0 16px rgba(147, 197, 253, 0.35);
+  position: relative;
+  z-index: 1;
 }
 
 .sponsors-logo-loop {
-  padding: 6px 0;
+  padding: 16px 6px;
   overflow: visible;
+  position: relative;
+  z-index: 1;
 }
 
 .sponsors-logo-loop .logoloop__track {
@@ -527,7 +575,11 @@
 
 .sponsors-logo-loop .logoloop__item {
   overflow: visible;
-  padding: 6px 0;
+  padding: 8px 12px;
+  border-radius: 0;
+  background: transparent;
+  border: none;
+  box-shadow: none;
 }
 
 .sponsors-logo-loop .logoloop__item img {
@@ -535,12 +587,63 @@
   width: auto;
   max-width: min(46vw, 380px);
   object-fit: contain;
-  filter: drop-shadow(0 3px 8px rgba(59, 130, 246, 0.22));
+  filter:
+    drop-shadow(0 6px 12px rgba(30, 64, 175, 0.14))
+    contrast(1.03)
+    brightness(1.04);
 }
 
 .sponsors-logo-loop.logoloop--scale-hover .logoloop__item:hover img {
-  transform: scale(1.5);
+  transform: scale(1.07);
   transform-origin: center;
+}
+
+@keyframes sponsorsGlowFloat {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.62;
+  }
+
+  50% {
+    transform: translateY(10px);
+    opacity: 0.82;
+  }
+}
+
+@keyframes sponsorsParticlesDrift {
+  0% {
+    transform: translateY(0) translateX(0);
+  }
+
+  100% {
+    transform: translateY(-12px) translateX(6px);
+  }
+}
+
+@keyframes sponsorsGradientShift {
+  0% {
+    background-position: center, 0% 50%;
+  }
+
+  50% {
+    background-position: center, 100% 50%;
+  }
+
+  100% {
+    background-position: center, 0% 50%;
+  }
+}
+
+@keyframes sponsorsStarsTwinkle {
+  0%,
+  100% {
+    opacity: 0.36;
+  }
+
+  50% {
+    opacity: 0.5;
+  }
 }
 
 /* =============================================

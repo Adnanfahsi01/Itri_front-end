@@ -3,8 +3,10 @@ import LogoLoop from './../../components/LogoLoop';
 
 const imageLogos = [
   { src: '/cadimage.png', alt: 'CAD Sponsor' },
-  { src: '/tangerimg.png', alt: 'Tanger Sponsor' },
+  { src: '/tangermo.png', alt: 'Tanger Sponsor' },
   { src: '/americancenter.png', alt: 'American Center Sponsor' },
+  { src: '/buenavista.png', alt: 'buenavista Sponsor' },
+  { src: '/ensi_logo.png', alt: 'ENSI Logo' },
 ];
 
 export default function Sponsors() {
