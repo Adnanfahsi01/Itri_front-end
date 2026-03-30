@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import './Navbar.css';
+import { registrationClosed } from '../config/registration';
 
 function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -32,9 +33,15 @@ function Navbar() {
           <Link to="/program" className="navbar-floating-link" onClick={closeMenu}>
             Program
           </Link>
-          <Link to="/reservation" className="navbar-floating-reserve" onClick={closeMenu}>
-            Reserve Your Seat
-          </Link>
+          {registrationClosed ? (
+            <span className="navbar-floating-reserve navbar-floating-reserve-disabled" aria-disabled="true">
+              Reservations Closed
+            </span>
+          ) : (
+            <Link to="/reservation" className="navbar-floating-reserve" onClick={closeMenu}>
+              Reserve Your Seat
+            </Link>
+          )}
         </div>
 
         {/* Mobile Menu Button */}

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { getPrograms } from '../utils/api';
 import './Program.css';
+import { registrationClosed } from '../config/registration';
 
 function Program() {
   const [programs, setPrograms] = useState([]);
@@ -73,11 +74,12 @@ function Program() {
             </button>
           ))}
           <button
-            onClick={() => window.location.href = '/hackathon'}
-            className="px-8 py-3 rounded-full font-bold text-lg transition-all duration-300 bg-indigo-600 text-white shadow-[0_0_20px_rgba(79,70,229,0.5)] transform hover:scale-105 border-transparent flex items-center gap-2"
+            onClick={() => !registrationClosed && (window.location.href = '/hackathon')}
+            disabled={registrationClosed}
+            className="px-8 py-3 rounded-full font-bold text-lg transition-all duration-300 bg-indigo-600 text-white shadow-[0_0_20px_rgba(79,70,229,0.5)] transform hover:scale-105 border-transparent flex items-center gap-2 disabled:bg-slate-700 disabled:text-slate-300 disabled:shadow-none disabled:cursor-not-allowed disabled:hover:scale-100"
           >
-            Day 3 (Hackathon)
-            <svg className="w-5 h-5 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
+            {registrationClosed ? 'Day 3 (Hackathon) - Closed' : 'Day 3 (Hackathon)'}
+            {!registrationClosed && <svg className="w-5 h-5 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>}
           </button>
         </div>
       </div>

@@ -2,6 +2,8 @@ import { useState } from 'react';
 import jsPDF from 'jspdf';
 import QRCode from 'qrcode';
 import { registerHackathon } from '../utils/api';
+import RegistrationClosedPanel from '../components/RegistrationClosedPanel';
+import { registrationClosed } from '../config/registration';
 
 function HackathonRegistration() {
   const MAX_INVITED_MEMBERS = 4;
@@ -284,6 +286,25 @@ function HackathonRegistration() {
   };
 
   return (
+    registrationClosed ? (
+      <div className="min-h-screen py-16 pt-32">
+        <div className="container mx-auto px-6 mb-10 text-center">
+          <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">Hackathon Registration Closed</h1>
+          <p className="text-lg text-slate-400 max-w-4xl mx-auto leading-relaxed">
+            The hackathon details remain available, but registration is now closed.
+          </p>
+        </div>
+
+        <div className="container mx-auto px-6 mb-20">
+          <div className="max-w-3xl mx-auto">
+            <RegistrationClosedPanel
+              title="This event is sold out"
+              message="Reservations are now closed for Day 1, Day 2, and Hackathon."
+            />
+          </div>
+        </div>
+      </div>
+    ) : (
     <div className="min-h-screen py-16 pt-32">
       <div className="container mx-auto px-6 mb-32 pb-4 text-center">
         <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
@@ -539,6 +560,7 @@ function HackathonRegistration() {
         </div>
       </div>
     </div>
+    )
   );
 }
 

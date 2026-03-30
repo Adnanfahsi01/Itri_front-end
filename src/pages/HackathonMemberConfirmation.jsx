@@ -4,6 +4,8 @@ import {
   confirmHackathonMemberInvitation,
   getHackathonMemberInvitation,
 } from '../utils/api';
+import RegistrationClosedPanel from '../components/RegistrationClosedPanel';
+import { registrationClosed } from '../config/registration';
 
 function HackathonMemberConfirmation() {
   const { token } = useParams();
@@ -40,6 +42,24 @@ function HackathonMemberConfirmation() {
 
     loadInvitation();
   }, [token]);
+
+  if (registrationClosed) {
+    return (
+      <div className="min-h-screen py-16 pt-32">
+        <div className="container mx-auto px-6 mb-12 text-center">
+          <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">Reservations Closed</h1>
+          <p className="text-lg text-slate-400 max-w-3xl mx-auto">
+            Hackathon registration and invitation confirmations are no longer available.
+          </p>
+        </div>
+        <div className="container mx-auto px-6 mb-20">
+          <div className="max-w-3xl mx-auto">
+            <RegistrationClosedPanel title="Hackathon registration has ended" />
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const handleChange = (e) => {
     const { name, value } = e.target;

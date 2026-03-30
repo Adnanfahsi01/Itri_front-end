@@ -65,6 +65,13 @@
   background: #2563eb;
 }
 
+.navbar-floating-reserve-disabled {
+  background: #475569;
+  color: #e2e8f0;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
 .navbar-floating-menu {
   display: none;
 }

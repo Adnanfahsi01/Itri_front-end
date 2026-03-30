@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { confirmReservation } from '../utils/api';
+import { registrationClosed } from '../config/registration';
 
 function ConfirmReservation() {
     const [searchParams] = useSearchParams();
@@ -65,12 +66,18 @@ function ConfirmReservation() {
                         </div>
                         <h2 className="text-2xl font-bold text-white mb-4">Error</h2>
                         <p className="text-red-400 mb-8">{message}</p>
-                        <Link
-                            to="/reservation"
-                            className="inline-block bg-primary text-white px-8 py-3 rounded-full font-bold hover:bg-accent transition-colors"
-                        >
-                            Try reservation again
-                        </Link>
+                        {registrationClosed ? (
+                            <span className="inline-block bg-slate-700 text-slate-300 px-8 py-3 rounded-full font-bold cursor-not-allowed">
+                                Reservations Closed
+                            </span>
+                        ) : (
+                            <Link
+                                to="/reservation"
+                                className="inline-block bg-primary text-white px-8 py-3 rounded-full font-bold hover:bg-accent transition-colors"
+                            >
+                                Try reservation again
+                            </Link>
+                        )}
                     </div>
                 )}
             </div>

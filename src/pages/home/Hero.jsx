@@ -3,6 +3,7 @@ import TextType from './TextType';
 import ShinyText from './ShinyText';
 import './Home.css';
 import './HeroAnimation.css';
+import { registrationClosed, registrationClosedBadge, registrationClosedMessage } from '../../config/registration';
 
 export default function Hero() {
   const navigate = useNavigate();
@@ -55,10 +56,11 @@ export default function Hero() {
         <div className="hero-buttons">
           <button
             className="btn btn-primary-gradient"
-            onClick={() => navigate('/reservation')}
-            style={{ padding: '14px 32px', borderRadius: '50px', border: 'none', backgroundColor: '#006AD7', color: 'white', cursor: 'pointer' }}
+            onClick={() => !registrationClosed && navigate('/reservation')}
+            disabled={registrationClosed}
+            style={{ padding: '14px 32px', borderRadius: '50px', border: 'none', backgroundColor: '#006AD7', color: 'white', cursor: registrationClosed ? 'not-allowed' : 'pointer', opacity: registrationClosed ? 0.65 : 1 }}
           >
-            Reserve Your Seat
+            {registrationClosed ? 'Reservations Closed' : 'Reserve Your Seat'}
           </button>
           <button
             className="btn btn-outline-white"
@@ -72,6 +74,12 @@ export default function Hero() {
             Location
           </button>
         </div>
+        {registrationClosed && (
+          <div className="hero-registration-closed" role="status" aria-live="polite">
+            <span className="hero-registration-closed-badge">{registrationClosedBadge}</span>
+            <p>{registrationClosedMessage}</p>
+          </div>
+        )}
         <ShinyText
           text="1, 2 and 3 April 2026"
           speed={3.8}

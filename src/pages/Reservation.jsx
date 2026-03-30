@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { createReservation, submitWaitlist } from '../utils/api';
 import jsPDF from 'jspdf';
 import QRCode from 'qrcode';
+import RegistrationClosedPanel from '../components/RegistrationClosedPanel';
+import { registrationClosed, registrationClosedBadge } from '../config/registration';
 
 function Reservation() {
   const [selectedDays, setSelectedDays] = useState(['day1']);
@@ -289,6 +291,39 @@ function Reservation() {
 
 
   return (
+    registrationClosed ? (
+      <div className="min-h-screen py-16 pt-32">
+        <div className="container mx-auto px-6 mb-10 text-center">
+          <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">Reservations Closed</h1>
+          <p className="text-lg text-slate-400 max-w-3xl mx-auto leading-relaxed">
+            Event information remains available below, but new reservations are no longer accepted.
+          </p>
+        </div>
+
+        <div className="container mx-auto px-6 mb-8">
+          <RegistrationClosedPanel
+            title="Registration has ended for Day 1, Day 2, and Hackathon"
+            message="This event is sold out. Reservations are now closed."
+          />
+        </div>
+
+        <div className="container mx-auto px-6 mb-20">
+          <div className="max-w-3xl mx-auto bg-slate-800 border border-slate-700 p-8 rounded-2xl shadow-xl">
+            <h2 className="text-2xl font-bold text-blue-300 mb-6 text-center">Event Status</h2>
+            <div className="grid md:grid-cols-3 gap-4">
+              {['Day 1', 'Day 2', 'Hackathon'].map((item) => (
+                <div key={item} className="rounded-xl border border-slate-600 bg-slate-900/40 p-4 text-center">
+                  <p className="text-sm font-semibold text-slate-300">{item}</p>
+                  <span className="mt-3 inline-flex rounded-full border border-slate-500 bg-slate-700 px-3 py-1 text-xs font-semibold uppercase tracking-[0.08em] text-slate-200">
+                    {registrationClosedBadge}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    ) : (
     <div className="min-h-screen py-16 pt-32">
       {/* Header */}
       <div className="container mx-auto px-6 mb-44 pb-8 text-center">
@@ -516,6 +551,7 @@ function Reservation() {
         </div>
       </div>
     </div>
+    )
   );
 }
 
