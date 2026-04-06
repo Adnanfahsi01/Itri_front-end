@@ -1,5 +1,4 @@
 import { Link } from 'react-router-dom';
-import { registrationClosed, registrationClosedBadge } from '../config/registration';
 
 function Footer() {
   return (
@@ -34,22 +33,14 @@ function Footer() {
                 </Link>
               </li>
               <li>
-                {registrationClosed ? (
-                  <span className="text-slate-500 cursor-not-allowed">Reserve Seat ({registrationClosedBadge})</span>
-                ) : (
-                  <Link to="/reservation" className="text-slate-400 hover:text-primary transition-colors">
-                    Reserve Seat
-                  </Link>
-                )}
+                <Link to="/reservation" className="text-slate-400 hover:text-primary transition-colors">
+                  Reserve Seat
+                </Link>
               </li>
               <li>
-                {registrationClosed ? (
-                  <span className="text-slate-500 cursor-not-allowed">Hackathon Registration ({registrationClosedBadge})</span>
-                ) : (
-                  <Link to="/hackathon" className="text-slate-400 hover:text-primary transition-colors">
-                    Hackathon Registration
-                  </Link>
-                )}
+                <Link to="/hackathon" className="text-slate-400 hover:text-primary transition-colors">
+                  Hackathon Registration
+                </Link>
               </li>
             </ul>
           </div>

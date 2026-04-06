@@ -3,7 +3,7 @@ import TextType from './TextType';
 import ShinyText from './ShinyText';
 import './Home.css';
 import './HeroAnimation.css';
-import { registrationClosed, registrationClosedBadge, registrationClosedMessage } from '../../config/registration';
+import { registrationOpenMessage, registrationUrgencyBadge } from '../../config/registration';
 
 export default function Hero() {
   const navigate = useNavigate();
@@ -56,11 +56,10 @@ export default function Hero() {
         <div className="hero-buttons">
           <button
             className="btn btn-primary-gradient"
-            onClick={() => !registrationClosed && navigate('/reservation')}
-            disabled={registrationClosed}
-            style={{ padding: '14px 32px', borderRadius: '50px', border: 'none', backgroundColor: '#006AD7', color: 'white', cursor: registrationClosed ? 'not-allowed' : 'pointer', opacity: registrationClosed ? 0.65 : 1 }}
+            onClick={() => navigate('/reservation')}
+            style={{ padding: '14px 32px', borderRadius: '50px', border: 'none', backgroundColor: '#006AD7', color: 'white', cursor: 'pointer', boxShadow: '0 0 0 2px rgba(59,130,246,0.25), 0 12px 28px rgba(59,130,246,0.35)' }}
           >
-            {registrationClosed ? 'Reservations Closed' : 'Reserve Your Seat'}
+            Register Now
           </button>
           <button
             className="btn btn-outline-white"
@@ -74,12 +73,10 @@ export default function Hero() {
             Location
           </button>
         </div>
-        {registrationClosed && (
-          <div className="hero-registration-closed" role="status" aria-live="polite">
-            <span className="hero-registration-closed-badge">{registrationClosedBadge}</span>
-            <p>{registrationClosedMessage}</p>
-          </div>
-        )}
+        <div className="hero-registration-closed" role="status" aria-live="polite">
+          <span className="hero-registration-closed-badge">{registrationUrgencyBadge}</span>
+          <p>{registrationOpenMessage}</p>
+        </div>
         <ShinyText
           text="1, 2 and 3 April 2026"
           speed={3.8}

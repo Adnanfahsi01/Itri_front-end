@@ -1,23 +1,17 @@
-const parseBoolean = (rawValue, fallback = false) => {
-  if (typeof rawValue === 'boolean') return rawValue;
-  if (typeof rawValue !== 'string') return fallback;
-
-  const normalized = rawValue.trim().toLowerCase();
-  if (['1', 'true', 'yes', 'on'].includes(normalized)) return true;
-  if (['0', 'false', 'no', 'off'].includes(normalized)) return false;
-
-  return fallback;
-};
-
-// Default is closed so production remains protected until explicitly reopened.
-export const registrationClosed = parseBoolean(import.meta.env.VITE_REGISTRATION_CLOSED, true);
+// Registrations are intentionally reopened across Day 1, Day 2, and Hackathon.
+export const registrationClosed = false;
+export const registrationOpen = !registrationClosed;
 
 export const registrationStatusByEvent = {
-  day1: registrationClosed,
-  day2: registrationClosed,
-  hackathon: registrationClosed,
+  day1: false,
+  day2: false,
+  hackathon: false,
 };
 
-export const registrationClosedBadge = 'Reservations Closed';
-export const registrationClosedMessage = 'Registration has ended for Day 1, Day 2, and Hackathon.';
-export const registrationClosedSecondary = 'Reservations are now closed.';
+export const registrationOpenMessage = '🎉 Registrations are now OPEN! Secure your spot now.';
+export const registrationUrgencyBadge = 'Limited spots available';
+
+// Kept for backward compatibility with components still importing these names.
+export const registrationClosedBadge = 'Registrations Open';
+export const registrationClosedMessage = registrationOpenMessage;
+export const registrationClosedSecondary = 'Limited spots available.';

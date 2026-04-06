@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import './Home.css';
-import { registrationClosed, registrationClosedMessage } from '../../config/registration';
+import { registrationOpenMessage, registrationUrgencyBadge } from '../../config/registration';
 
 export default function CTA() {
   const navigate = useNavigate();
@@ -16,10 +16,9 @@ export default function CTA() {
         <div className="cta-buttons">
           <button
             className="btn btn-primary-gradient"
-            onClick={() => !registrationClosed && navigate('/reservation')}
-            disabled={registrationClosed}
+            onClick={() => navigate('/reservation')}
           >
-            {registrationClosed ? 'Sold Out' : 'Reserve Your Seat'}
+            Book Ticket
           </button>
           <button
             className="btn btn-outline-white"
@@ -28,11 +27,11 @@ export default function CTA() {
             View Program
           </button>
         </div>
-        {registrationClosed && (
-          <p className="cta-closed-note" role="status" aria-live="polite">
-            {registrationClosedMessage}
-          </p>
-        )}
+        <p className="cta-closed-note" role="status" aria-live="polite">
+          {registrationOpenMessage}
+          {' '}
+          <span className="hero-registration-closed-badge">{registrationUrgencyBadge}</span>
+        </p>
       </div>
     </section>
   );
